@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.log
+
+# 本地截图 / 浏览器临时目录
+tmp-chrome/
+shots/
+tsconfig.tsbuildinfo

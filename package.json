@@ -1,0 +1,26 @@
+{
+  "name": "joblens",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "职镜 JobLens — 面向大学生求职场景的 AI 简历竞争力分析与优化平台（前端 Demo）",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "node scripts/serve.mjs dist 4173",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "tailwindcss": "^4.1.14",
+    "typescript": "~5.6.3",
+    "vite": "^6.3.5"
+  }
+}

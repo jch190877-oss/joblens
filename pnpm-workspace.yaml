@@ -1,0 +1,16 @@
+# pnpm 11+ 的工程设置统一放在这里（package.json 里的 pnpm 字段已不再读取）
+packages:
+  - '.'
+
+# 扁平 node_modules（接近 npm 布局）。
+# 团队里 Windows 同学克隆后直接 install 即可，不依赖符号链接权限，
+# 也不会出现「找不到某个间接依赖」的报错。
+nodeLinker: hoisted
+
+# 只允许 esbuild 执行安装脚本（它需要落位平台二进制）。
+# 其他依赖的 postinstall 一律不跑，降低供应链风险。
+allowBuilds:
+  esbuild: true
+
+# 每次 run 前不重复做依赖校验
+verifyDepsBeforeRun: false

@@ -1,0 +1,11 @@
+# 统一换行符：Windows / macOS 混合协作时，避免整文件 diff
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.woff2 binary
+
+# 锁文件不要做 diff
+pnpm-lock.yaml linguist-generated=true

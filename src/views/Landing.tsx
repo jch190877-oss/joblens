@@ -155,13 +155,12 @@ export function Landing() {
             <div className="animate-rise">
               <Kicker className="mb-5">AI 简历竞争力分析 · 大学生求职场景</Kicker>
 
-              <h1 className="text-[36px] font-semibold leading-[1.18] tracking-tight sm:text-[46px] lg:text-[52px]">
+              <h1 className="hero-title">
                 把做过的事，
-                <br />
-                讲成<span className="text-grad">值得录用的证据</span>
+                <span className="hero-title-accent text-grad">讲成值得录用的证据</span>
               </h1>
 
-              <p className="mt-6 max-w-[540px] text-[15px] leading-[1.85] text-fg-muted">
+              <p className="mt-6 max-w-[34rem] text-base leading-[1.85] text-fg-muted">
                 职镜不会替你编经历。它只做一件事：
                 <span className="text-fg"> 把目标岗位的要求逐条拆开，再把你真实做过的事，一条一条对上。</span>
                 对不上的地方，它不猜——它来问你。

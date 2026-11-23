@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './fonts.css';
 
 /* ============================================================
    职镜 JobLens · 设计令牌
@@ -6,10 +7,9 @@
    ============================================================ */
 @theme {
   --font-sans:
-    'Inter', 'HarmonyOS Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
-    'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    'JobLens Text', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif;
   --font-mono:
-    'JetBrains Mono', ui-monospace, SFMono-Regular, 'Cascadia Mono', Menlo, Consolas, monospace;
+    'Cascadia Mono', ui-monospace, 'SFMono-Regular', Consolas, 'JobLens Text', monospace;
 
   /* 底色阶 */
   --color-ink-950: #06070a;
@@ -23,8 +23,8 @@
 
   /* 文字 */
   --color-fg: #eef1f7;
-  --color-fg-muted: #99a1b3;
-  --color-fg-dim: #6a7285;
+  --color-fg-muted: #a8b2c5;
+  --color-fg-dim: #818ca2;
 
   /* 主色 */
   --color-brand-300: #b4c4ff;
@@ -60,7 +60,7 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-feature-settings: 'tnum' on, 'lnum' on;
+    line-height: 1.65;
   }
 
   ::selection {
@@ -72,7 +72,7 @@
   h2,
   h3,
   h4 {
-    letter-spacing: -0.022em;
+    letter-spacing: -0.012em;
     text-wrap: balance;
   }
 
@@ -90,6 +90,24 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-ink-500);
+  }
+}
+
+.hero-title {
+  font-family: 'JobLens Display', 'Songti SC', 'Noto Serif CJK SC', SimSun, serif;
+  font-size: clamp(1.75rem, 8.2vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.23;
+  letter-spacing: 0.005em;
+}
+
+.hero-title-accent {
+  display: block;
+}
+
+@media (min-width: 64rem) {
+  .hero-title {
+    font-size: clamp(2.625rem, 4.2vw, 3.5rem);
   }
 }
 

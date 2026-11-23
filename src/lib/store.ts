@@ -16,6 +16,32 @@ function initial(): string {
 let caseId: string = initial()
 const listeners = new Set<() => void>()
 
+// Answers belong to the current tab session and stay isolated by case.
+const caseAnswers = new Map<string, Record<string, string>>()
+
+export function getCaseAnswers(id: string) {
+  return caseAnswers.get(id)
+}
+
+export function saveCaseAnswers(id: string, answers: Record<string, string>) {
+  caseAnswers.set(id, answers)
+}
+
+export function getCompletedEvidence(current: Case) {
+  const answers = getCaseAnswers(current.id)
+  if (!answers || !current.deep.questions.every((question) => answers[question.id]?.trim())) {
+    return null
+  }
+
+  const facts = new Map(current.deep.questions.map((question) => [
+    question.token,
+    answers[question.id].trim(),
+  ]))
+  return current.deep.template.replace(/\{([^}]+)\}/g, (placeholder, token: string) =>
+    facts.get(token) ?? placeholder,
+  )
+}
+
 export function setCaseId(id: string) {
   if (!CASES.some((c) => c.id === id)) return
   caseId = id

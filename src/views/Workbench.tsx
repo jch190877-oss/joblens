@@ -1,60 +1,24 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Kicker, Shell, Tag } from '../components/ui'
 import { ArrowRight, CheckCircle, Doc, Sparkle, Target, Shield, ChevronRight } from '../components/icons'
 import { navigate } from '../lib/router'
 import { CASES } from '../data/demo'
 import { setCaseId, useCase, useCaseId } from '../lib/store'
 
-const STEPS = ['选择简历', '输入目标岗位', '核对拆解结果']
-
-const ANALYZE_STEPS = [
-  { label: '解析简历结构', desc: '识别模块、条目、时间线' },
-  { label: '拆解岗位要求', desc: '硬性条件 / 核心职责 / 加分项' },
-  { label: '逐条对照原文', desc: '四态判定 + 原文依据定位' },
-  { label: '事实安全校验', desc: '拦截无依据的表述与数字' },
-]
+const STEPS = ['选择简历', '查看目标岗位', '核对拆解结果']
 
 export function Workbench() {
   const current = useCase()
   const currentId = useCaseId()
 
   const [step, setStep] = useState(0)
-  const [resume, setResume] = useState(current.resume)
-  const [jd, setJd] = useState(current.jd)
-  const [editing, setEditing] = useState(false)
-  const [analyzing, setAnalyzing] = useState(false)
-  const [progress, setProgress] = useState(0)
-
-  // 切换案例时同步文本
-  useEffect(() => {
-    setResume(current.resume)
-    setJd(current.jd)
-    setEditing(false)
-  }, [current.id, current.resume, current.jd])
-
   const grouped = useMemo(() => {
     const g = { hard: [], core: [], plus: [] } as Record<string, typeof current.requirements>
     current.requirements.forEach((r) => g[r.type].push(r))
     return g
   }, [current])
 
-  // 生成动画
-  useEffect(() => {
-    if (!analyzing) return
-    if (progress >= ANALYZE_STEPS.length) {
-      const t = setTimeout(() => navigate('/report'), 420)
-      return () => clearTimeout(t)
-    }
-    const t = setTimeout(() => setProgress((p) => p + 1), 720)
-    return () => clearTimeout(t)
-  }, [analyzing, progress])
-
-  function startAnalyze() {
-    setAnalyzing(true)
-    setProgress(0)
-  }
-
-  const NEXT_LABEL = ['下一步：输入岗位描述', '下一步：查看拆解结果', null]
+  const NEXT_LABEL = ['下一步：查看岗位描述', '下一步：查看拆解结果', null]
 
   return (
     <Shell className="py-12 sm:py-16">
@@ -63,10 +27,10 @@ export function Workbench() {
         <div>
           <Kicker className="mb-3">分析工作台</Kicker>
           <h1 className="text-[28px] font-semibold leading-tight sm:text-[34px]">
-            三步生成你的岗位对照报告
+            用一个案例体验岗位对照
           </h1>
           <p className="mt-2.5 max-w-xl text-[13.5px] leading-relaxed text-fg-muted">
-            演示环境预置了 3 份来自访谈的真实简历与对应 JD。你也可以直接粘贴自己的材料。
+            选择一个脱敏案例，依次查看简历、岗位描述和预设对照报告。自定义材料分析待接入。
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-ink-700 bg-ink-850/60 px-3 py-2">
@@ -174,24 +138,12 @@ export function Workbench() {
                     <Doc className="h-3.5 w-3.5 text-fg-dim" />
                     <span className="text-[12.5px] font-medium text-fg-muted">简历文本</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setEditing((v) => !v)}
-                    className="text-[11.5px] text-brand-300 hover:text-brand-400"
-                  >
-                    {editing ? '完成编辑' : '粘贴我自己的简历'}
-                  </button>
                 </div>
                 <textarea
-                  value={resume}
-                  onChange={(e) => setResume(e.target.value)}
-                  readOnly={!editing}
-                  spellCheck={false}
-                  className={`h-[240px] w-full resize-none rounded-xl border p-4 font-mono text-[12px] leading-[1.85] outline-none transition-colors ${
-                    editing
-                      ? 'border-brand-500/50 bg-ink-950 text-fg'
-                      : 'border-ink-700 bg-ink-950/60 text-fg-muted'
-                  }`}
+                  value={current.resume}
+                  readOnly
+                  aria-label="示例简历"
+                  className="h-[240px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/60 p-4 font-mono text-[12px] leading-[1.85] text-fg-muted"
                 />
               </div>
             </div>
@@ -202,9 +154,9 @@ export function Workbench() {
             <div className="animate-fade">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-[16px] font-semibold">粘贴目标岗位描述</h2>
+                  <h2 className="text-[16px] font-semibold">查看示例岗位描述</h2>
                   <p className="mt-1.5 text-[12.5px] text-fg-muted">
-                    岗位职责与任职要求越完整，拆解出的条目越准。
+                    下一步可查看案例中的硬性条件、核心职责与加分项。
                   </p>
                 </div>
                 <Tag tone="brand">{current.role}</Tag>
@@ -217,12 +169,13 @@ export function Workbench() {
                     <span className="text-[12.5px] font-medium text-fg-muted">岗位描述（JD）</span>
                   </div>
                   <span className="font-mono text-[10.5px] text-fg-dim">
-                    {jd.length} 字
+                    {current.jd.length} 字
                   </span>
                 </div>
                 <textarea
-                  value={jd}
-                  onChange={(e) => setJd(e.target.value)}
+                  value={current.jd}
+                  readOnly
+                  aria-label="示例岗位描述"
                   spellCheck={false}
                   className="h-[330px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/70 p-4 font-mono text-[12px] leading-[1.9] text-fg-muted outline-none transition-colors focus:border-brand-500/50 focus:text-fg"
                 />
@@ -308,8 +261,8 @@ export function Workbench() {
                 {NEXT_LABEL[step]}
               </Button>
             ) : (
-              <Button onClick={startAnalyze} icon={<Sparkle className="h-3.5 w-3.5" />}>
-                开始对照分析
+              <Button onClick={() => navigate('/report')} icon={<Sparkle className="h-3.5 w-3.5" />}>
+                打开案例报告
               </Button>
             )}
           </div>
@@ -371,69 +324,6 @@ export function Workbench() {
         </aside>
       </div>
 
-      {/* 分析中遮罩 */}
-      {analyzing && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-ink-950/85 backdrop-blur-md">
-          <div className="panel w-[min(440px,90vw)] rounded-2xl p-7">
-            <div className="mb-1 flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-pulse-ring rounded-full bg-brand-500" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
-              </span>
-              <span className="text-[14px] font-semibold">正在生成对照报告</span>
-            </div>
-            <p className="mb-6 text-[11.5px] text-fg-dim">
-              {current.person} · {current.role}
-            </p>
-
-            <div className="space-y-3">
-              {ANALYZE_STEPS.map((s, i) => {
-                const done = i < progress
-                const running = i === progress
-                return (
-                  <div key={s.label} className="flex items-start gap-3">
-                    <span
-                      className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                        done
-                          ? 'border-ok/40 bg-ok/20 text-ok'
-                          : running
-                            ? 'border-brand-500/50 bg-brand-500/20'
-                            : 'border-ink-600'
-                      }`}
-                    >
-                      {done ? (
-                        <CheckCircle className="h-2.5 w-2.5" />
-                      ) : running ? (
-                        <span className="h-1.5 w-1.5 animate-blink rounded-full bg-brand-400" />
-                      ) : null}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div
-                        className={`text-[12.5px] ${
-                          done ? 'text-fg-muted' : running ? 'text-fg' : 'text-fg-dim'
-                        }`}
-                      >
-                        {s.label}
-                      </div>
-                      <div className="text-[10.5px] text-fg-dim">{s.desc}</div>
-                    </div>
-                    {running && (
-                      <span className="font-mono text-[10px] text-brand-300">···</span>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="mt-6 h-1 overflow-hidden rounded-full bg-ink-700">
-              <div
-                className="h-full rounded-full bg-brand-500 transition-all duration-500"
-                style={{ width: `${(progress / ANALYZE_STEPS.length) * 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </Shell>
   )
 }

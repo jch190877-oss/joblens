@@ -11,7 +11,7 @@ import {
 } from '../components/icons'
 import { navigate } from '../lib/router'
 import { CASES } from '../data/demo'
-import { setCaseId, useCase, useCaseId } from '../lib/store'
+import { getCaseAnswers, saveCaseAnswers, setCaseId, useCase, useCaseId } from '../lib/store'
 
 export function Deepdive() {
   const current = useCase()
@@ -27,9 +27,22 @@ export function Deepdive() {
     }
   }, [])
 
-  const [answers, setAnswers] = useState<Record<string, string>>(() =>
-    prefill ? Object.fromEntries(deep.questions.map((q) => [q.id, q.chips[0]])) : {},
-  )
+  const [answers, setAnswers] = useState<Record<string, string>>(() => initialAnswers(current))
+
+  function initialAnswers(selected: typeof current) {
+    return getCaseAnswers(selected.id) ??
+      (prefill ? Object.fromEntries(selected.deep.questions.map((q) => [q.id, q.chips[0]])) : {})
+  }
+
+  function updateAnswers(next: Record<string, string>) {
+    saveCaseAnswers(current.id, next)
+    setAnswers(next)
+  }
+
+  function reviewEvidence() {
+    saveCaseAnswers(current.id, answers)
+    navigate('/rewrite')
+  }
   const [focused, setFocused] = useState<string | null>(null)
 
   const total = deep.questions.length
@@ -41,7 +54,7 @@ export function Deepdive() {
   const pct = Math.round((filled / total) * 100)
 
   function set(id: string, v: string) {
-    setAnswers((a) => ({ ...a, [id]: v }))
+    updateAnswers({ ...answers, [id]: v })
   }
 
   function fillExamples() {
@@ -49,7 +62,7 @@ export function Deepdive() {
     deep.questions.forEach((q) => {
       if (!(next[q.id] ?? '').trim()) next[q.id] = q.chips[0]
     })
-    setAnswers(next)
+    updateAnswers(next)
   }
 
   // 把模板里的 {token} 渲染成已填 / 待补充
@@ -104,10 +117,10 @@ export function Deepdive() {
               size="sm"
               variant={done ? 'primary' : 'soft'}
               disabled={!done}
-              onClick={() => navigate('/rewrite')}
+              onClick={reviewEvidence}
               icon={<ArrowRight className="h-3.5 w-3.5" />}
             >
-              生成改写稿
+              带证据去改写工作台
             </Button>
           </div>
         </div>
@@ -118,8 +131,10 @@ export function Deepdive() {
               key={c.id}
               type="button"
               onClick={() => {
+                if (c.id === currentId) return
                 setCaseId(c.id)
-                setAnswers({})
+                setAnswers(initialAnswers(c))
+                setFocused(null)
               }}
               className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11.5px] transition-all ${
                 c.id === currentId
@@ -213,14 +228,14 @@ export function Deepdive() {
             <div className="animate-rise rounded-xl border border-ok/25 bg-ok/[0.06] p-5">
               <div className="flex items-center gap-2 text-[12.5px] font-medium text-ok">
                 <CheckCircle className="h-3.5 w-3.5" />
-                这条经历已经具备可核验的信息量
+                追问已填完，请核对证据内容
               </div>
               <p className="mt-2 text-[11.5px] leading-relaxed text-fg-muted">{deep.afterNote}</p>
               <Button
                 variant="soft"
                 size="sm"
                 className="mt-3.5 w-full"
-                onClick={() => navigate('/rewrite')}
+                onClick={reviewEvidence}
                 icon={<ArrowRight className="h-3.5 w-3.5" />}
               >
                 去改写工作台对比
@@ -245,8 +260,8 @@ export function Deepdive() {
           <div className="flex items-center gap-2 rounded-xl border border-brand-500/20 bg-brand-500/[0.05] px-4 py-3">
             <Chat className="h-3.5 w-3.5 shrink-0 text-brand-400" />
             <p className="text-[12px] leading-relaxed text-fg-muted">
-              AI 会一次只问一个问题，从「你做了什么」问到「你怎么知道它有效」。
-              回答时可以先用下面的示例句式，再改成你自己的真实情况。
+              案例预设了几条追问，从「你做了什么」问到「你怎么知道它有效」。
+              可直接填写或使用示例，答案仅保留在当前页面会话。
             </p>
           </div>
 

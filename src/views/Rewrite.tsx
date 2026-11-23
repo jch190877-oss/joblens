@@ -49,7 +49,7 @@ export function Rewrite() {
   const currentId = useCaseId()
 
   const [accepted, setAccepted] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(current.rewrites.map((r) => [r.id, r.fact !== 'removed'])),
+    () => Object.fromEntries(current.rewrites.map((r) => [r.id, r.fact === 'verified'])),
   )
   const [hrMode, setHrMode] = useState(false)
   const [showExport, setShowExport] = useState(false)
@@ -59,20 +59,15 @@ export function Rewrite() {
   const [lastId, setLastId] = useState(current.id)
   if (lastId !== current.id) {
     setLastId(current.id)
-    setAccepted(Object.fromEntries(current.rewrites.map((r) => [r.id, r.fact !== 'removed'])))
+    setAccepted(Object.fromEntries(current.rewrites.map((r) => [r.id, r.fact === 'verified'])))
   }
 
-  const acceptCount = useMemo(
-    () => current.rewrites.filter((r) => accepted[r.id] && r.action !== 'remove').length,
-    [accepted, current],
-  )
-
+  const exportable = current.rewrites.filter((r) => accepted[r.id] && r.fact === 'verified')
+  const acceptCount = exportable.length
   const compiled = useMemo(() => {
-    const lines = current.rewrites
-      .filter((r) => accepted[r.id] && r.action !== 'remove')
-      .map((r) => `· ${r.after}`)
+    const lines = exportable.map((r) => `· ${r.after}`)
     return `【改写后 · ${current.role}】\n\n${lines.join('\n')}`
-  }, [accepted, current])
+  }, [exportable, current.role])
 
   function toggle(id: string) {
     setAccepted((a) => ({ ...a, [id]: !a[id] }))
@@ -194,6 +189,7 @@ export function Rewrite() {
             const on = accepted[r.id]
             const fm = FACT_META[r.fact]
             const isRemove = r.action === 'remove'
+            const canAccept = r.fact === 'verified'
             return (
               <div
                 key={r.id}
@@ -227,6 +223,8 @@ export function Rewrite() {
                   <button
                     type="button"
                     onClick={() => toggle(r.id)}
+                    disabled={!canAccept}
+                    aria-pressed={canAccept ? Boolean(on) : undefined}
                     className={`flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-[11px] transition-colors ${
                       on
                         ? 'bg-ok/15 text-ok'
@@ -234,7 +232,7 @@ export function Rewrite() {
                     }`}
                   >
                     {on ? <CheckCircle className="h-3 w-3" /> : <XMark className="h-3 w-3" />}
-                    {on ? '已采纳' : '已忽略'}
+                    {canAccept ? (on ? '已采纳' : '已忽略') : '不加入投递版'}
                   </button>
                 </div>
 
@@ -394,7 +392,7 @@ export function Rewrite() {
 
             <div className="flex flex-col justify-between gap-3 border-t border-ink-700 px-5 py-3.5 sm:flex-row sm:items-center">
               <p className="text-[11px] text-fg-dim">
-                已包含 {acceptCount} 条；被忽略与被拦截的条目不会出现在投递版中。
+                已采纳的示例建议共 {acceptCount} 条。待补数字、删除建议和拦截条目均排除。
               </p>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={copy}>

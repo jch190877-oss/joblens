@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { CheckCircle, Minus, XMark, HelpCircle, ArrowRight } from './icons'
 import type { Status } from '../data/demo'
 
@@ -171,7 +171,7 @@ export function StatusPill({ status, size = 'md' }: { status: Status; size?: 'sm
 
 export function ScoreDial({
   value,
-  size = 168,
+  size = 176,
   label = '综合匹配度',
   sub,
 }: {
@@ -180,50 +180,115 @@ export function ScoreDial({
   label?: string
   sub?: string
 }) {
-  const r = size / 2 - 12
+  const shown = useCountUp(value)
+
+  const cx = size / 2
+  const cy = size / 2
+  const r = size / 2 - 22
   const c = 2 * Math.PI * r
-  // 只画 260° 的弧
-  const arc = 0.7222
+  const ARC_DEG = 260 // 只画 260°，留出底部缺口
+  const arc = ARC_DEG / 360
   const dash = c * arc
   const filled = (value / 100) * dash
-  const stroke =
-    value >= 75 ? 'var(--color-ok)' : value >= 55 ? 'var(--color-brand-500)' : 'var(--color-warn)'
+
+  const gradFrom = value >= 75 ? '#3dd68c' : value >= 55 ? '#8fa6ff' : '#f5b144'
+  const gradTo = value >= 75 ? '#7ef0b8' : value >= 55 ? '#6e8bff' : '#ffcf7a'
+  const tickNum = 27
 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-[132deg]">
+      <svg width={size} height={size} className="-rotate-[130deg]" aria-hidden>
+        <defs>
+          <linearGradient id="jl-dial" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={gradFrom} />
+            <stop offset="100%" stopColor={gradTo} />
+          </linearGradient>
+        </defs>
+
+        {/* 刻度圈：只在弧覆盖的范围内画 */}
+        {Array.from({ length: tickNum }).map((_, i) => {
+          const deg = (i / (tickNum - 1)) * ARC_DEG
+          const major = i % 2 === 0
+          const active = i / (tickNum - 1) <= value / 100
+          const len = major ? 6 : 3
+          return (
+            <line
+              key={i}
+              x1={cx + r + 13}
+              y1={cy}
+              x2={cx + r + 13 + len}
+              y2={cy}
+              transform={`rotate(${deg} ${cx} ${cy})`}
+              stroke={active ? gradFrom : 'var(--color-ink-600)'}
+              strokeOpacity={active ? 0.75 : 0.5}
+              strokeWidth={major ? 1.5 : 1}
+              strokeLinecap="round"
+            />
+          )
+        })}
+
+        {/* 轨道 */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={cx}
+          cy={cy}
           r={r}
           fill="none"
           stroke="var(--color-ink-700)"
-          strokeWidth="7"
+          strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={`${dash} ${c}`}
         />
+        {/* 数据弧 */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={cx}
+          cy={cy}
           r={r}
           fill="none"
-          stroke={stroke}
-          strokeWidth="7"
+          stroke="url(#jl-dial)"
+          strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={`${filled} ${c}`}
-          style={{ transition: 'stroke-dasharray 1.1s cubic-bezier(.2,.7,.2,1)' }}
+          style={{ transition: 'stroke-dasharray 1.2s cubic-bezier(.2,.7,.2,1)' }}
         />
       </svg>
+
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="tnum flex items-baseline gap-0.5">
-          <span className="text-[44px] font-semibold leading-none tracking-tight">{value}</span>
-          <span className="text-[15px] font-medium text-fg-dim">/100</span>
+          <span className="text-[46px] font-semibold leading-none tracking-tight">{shown}</span>
+          <span className="text-[14px] font-medium text-fg-dim">/100</span>
         </div>
-        <div className="mt-1.5 text-[11.5px] font-medium tracking-wide text-fg-muted">{label}</div>
-        {sub && <div className="mt-0.5 font-mono text-[10px] text-fg-dim">{sub}</div>}
+        <div className="mt-2 text-[11.5px] font-medium tracking-wide text-fg-muted">{label}</div>
+        {sub && <div className="mt-0.5 font-mono text-[10px] tracking-wider text-fg-dim">{sub}</div>}
       </div>
     </div>
   )
+}
+
+/** 数字滚动增长（尊重系统「减少动态效果」设置，此时直接显示终值） */
+function useCountUp(target: number, duration = 1100) {
+  const [v, setV] = useState(() => {
+    if (typeof window === 'undefined') return target
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? target : 0
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setV(target)
+      return
+    }
+    let raf = 0
+    const start = performance.now()
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration)
+      const e = 1 - Math.pow(1 - t, 3)
+      setV(Math.round(target * e))
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [target, duration])
+
+  return v
 }
 
 export function Meter({
@@ -239,22 +304,46 @@ export function Meter({
 }) {
   const color =
     value >= 75 ? 'bg-ok' : value >= 55 ? 'bg-brand-500' : value >= 40 ? 'bg-warn' : 'bg-bad'
+  const tint =
+    value >= 75
+      ? 'shadow-[0_0_14px_-2px] shadow-ok/50'
+      : value >= 55
+        ? 'shadow-[0_0_14px_-2px] shadow-brand-500/50'
+        : value >= 40
+          ? 'shadow-[0_0_14px_-2px] shadow-warn/50'
+          : 'shadow-[0_0_14px_-2px] shadow-bad/50'
+
   return (
     <div className="group">
       <div className="mb-1.5 flex items-baseline justify-between gap-3">
-        <span className="text-[13px] text-fg-muted">{label}</span>
+        <span className="text-[12.5px] text-fg-muted transition-colors group-hover:text-fg">
+          {label}
+        </span>
         <span className="tnum font-mono text-[13px] font-medium text-fg">{value}</span>
       </div>
-      <div className="h-[5px] overflow-hidden rounded-full bg-ink-700">
+
+      <div className="relative h-[6px] overflow-hidden rounded-full bg-ink-800 ring-1 ring-inset ring-ink-700/70">
         <div
-          className={`h-full rounded-full ${color}`}
+          className={`relative h-full rounded-full ${color} ${tint}`}
           style={{
             width: `${value}%`,
-            animation: `jl-grow 1s cubic-bezier(.2,.7,.2,1) ${delay}ms both`,
+            animation: `jl-grow 1.05s cubic-bezier(.2,.7,.2,1) ${delay}ms both`,
+            backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.28) 100%)',
+          }}
+        />
+        {/* 刻度：铺在最上层，读数时有"量尺"感 */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(90deg, rgba(255,255,255,.13) 0 1px, transparent 1px 10%)',
           }}
         />
       </div>
-      {hint && <div className="mt-1.5 text-[11.5px] leading-relaxed text-fg-dim">{hint}</div>}
+
+      {hint && (
+        <div className="mt-1 text-[11px] leading-[1.6] text-fg-dim">{hint}</div>
+      )}
       <style>{`@keyframes jl-grow{from{width:0}}`}</style>
     </div>
   )

@@ -55,7 +55,12 @@
   }
 
   body {
+    /* 顶部冷光 + 底部压暗，让页面有"光从上方打下来"的方向感 */
     background-color: var(--color-ink-950);
+    background-image:
+      radial-gradient(130% 80% at 50% -12%, rgba(110, 139, 255, 0.075) 0%, transparent 58%),
+      radial-gradient(110% 70% at 50% 108%, rgba(0, 0, 0, 0.5) 0%, transparent 62%);
+    background-attachment: fixed;
     color: var(--color-fg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -66,6 +71,13 @@
   ::selection {
     background: color-mix(in srgb, var(--color-brand-500) 38%, transparent);
     color: #fff;
+  }
+
+  /* 键盘可达性：全局焦点环 */
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-brand-400) 88%, transparent);
+    outline-offset: 2px;
+    border-radius: 8px;
   }
 
   h1,
@@ -132,13 +144,26 @@
   background-size: 22px 22px;
 }
 
-/* 主色辉光 */
+/* 主色光：从左上角打下来，比居中一团更"有光源" */
 .glow-brand {
   background: radial-gradient(
-    60% 60% at 50% 0%,
-    color-mix(in srgb, var(--color-brand-500) 22%, transparent) 0%,
-    transparent 70%
+    72% 118% at 28% -18%,
+    rgba(110, 139, 255, 0.28) 0%,
+    rgba(110, 139, 255, 0.09) 42%,
+    transparent 72%
   );
+}
+
+/* 斜向光带：用于首屏标题区，比纯径向更有方向 */
+.light-band {
+  background: linear-gradient(
+    102deg,
+    transparent 14%,
+    rgba(146, 169, 255, 0.1) 44%,
+    rgba(146, 169, 255, 0.03) 62%,
+    transparent 82%
+  );
+  filter: blur(28px);
 }
 
 .glow-ok {
@@ -153,19 +178,41 @@
   border-top: 1px solid color-mix(in srgb, var(--color-ink-600) 60%, transparent);
 }
 
-/* 面板 */
+/* 面板：渐变面 + 顶部内高光 + 双层阴影，制造"浮起来"的材质感 */
 .panel {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-ink-800) 92%, white 8%) 0%,
-    var(--color-ink-850) 100%
-  );
-  border: 1px solid color-mix(in srgb, var(--color-ink-600) 80%, transparent);
+  background: linear-gradient(180deg, #151a25 0%, #0f131b 100%);
+  border: 1px solid #232a38;
+  /* 上边缘更亮 = 被上方光源照到 */
+  border-top-color: rgba(255, 255, 255, 0.11);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 18px 46px -28px rgba(0, 0, 0, 0.95);
 }
 
 .panel-flat {
   background: var(--color-ink-850);
-  border: 1px solid color-mix(in srgb, var(--color-ink-600) 75%, transparent);
+  border: 1px solid #222836;
+  border-top-color: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* ---------------- 质感层：噪点 / 高光 ---------------- */
+
+/* 全站细噪点。暗色 UI 加一层 3% 的颗粒，能立刻消除"塑料感" */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* 底部渐隐，长页面滚动时不至于"硬切" */
+.fade-both {
+  mask-image: linear-gradient(to bottom, transparent 0, black 12%, black 88%, transparent 100%);
 }
 
 /* 顶部渐隐遮罩 */

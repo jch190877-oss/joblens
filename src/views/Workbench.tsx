@@ -26,7 +26,7 @@ export function Workbench() {
       <div className="mb-9 flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div>
           <Kicker className="mb-3">分析工作台</Kicker>
-          <h1 className="text-[28px] font-semibold leading-tight sm:text-[34px]">
+          <h1 className="editorial-heading text-[30px] sm:text-[37px]">
             用一个案例体验岗位对照
           </h1>
           <p className="mt-2.5 max-w-xl text-[13.5px] leading-relaxed text-fg-muted">
@@ -65,7 +65,7 @@ export function Workbench() {
                     done
                       ? 'bg-ok/20 text-ok'
                       : active
-                        ? 'bg-brand-500 text-[#08090C]'
+                        ? 'bg-brand-500 text-white'
                         : 'bg-ink-700 text-fg-dim'
                   }`}
                 >
@@ -93,7 +93,7 @@ export function Workbench() {
           {/* ---------- STEP 1 ---------- */}
           {step === 0 && (
             <div className="animate-fade">
-              <h2 className="text-[16px] font-semibold">选择一份演示简历</h2>
+              <h2 className="text-[19px] font-bold">选择一份演示简历</h2>
               <p className="mt-1.5 text-[12.5px] text-fg-muted">
                 这 3 份简历均来自访谈中同学自述的真实经历，已匿名化。
               </p>
@@ -143,7 +143,7 @@ export function Workbench() {
                   value={current.resume}
                   readOnly
                   aria-label="示例简历"
-                  className="h-[240px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/60 p-4 font-mono text-[12px] leading-[1.85] text-fg-muted"
+                  className="h-[240px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/60 p-4 text-sm leading-[1.85] text-fg-muted"
                 />
               </div>
             </div>
@@ -154,7 +154,7 @@ export function Workbench() {
             <div className="animate-fade">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-[16px] font-semibold">查看示例岗位描述</h2>
+                  <h2 className="text-[19px] font-bold">查看示例岗位描述</h2>
                   <p className="mt-1.5 text-[12.5px] text-fg-muted">
                     下一步可查看案例中的硬性条件、核心职责与加分项。
                   </p>
@@ -177,7 +177,7 @@ export function Workbench() {
                   readOnly
                   aria-label="示例岗位描述"
                   spellCheck={false}
-                  className="h-[330px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/70 p-4 font-mono text-[12px] leading-[1.9] text-fg-muted outline-none transition-colors focus:border-brand-500/50 focus:text-fg"
+                  className="h-[330px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/70 p-4 text-sm leading-[1.9] text-fg-muted outline-none transition-colors focus:border-brand-500/50 focus:text-fg"
                 />
               </div>
 
@@ -197,7 +197,7 @@ export function Workbench() {
             <div className="animate-fade">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-[16px] font-semibold">拆解结果 · 请核对</h2>
+                  <h2 className="text-[19px] font-bold">拆解结果 · 请核对</h2>
                   <p className="mt-1.5 text-[12.5px] text-fg-muted">
                     共识别 {current.requirements.length} 条要求。拆错的地方可以直接勾掉。
                   </p>

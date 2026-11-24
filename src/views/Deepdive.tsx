@@ -100,7 +100,7 @@ export function Deepdive() {
         <Kicker className="mb-3">反问式深挖 · 核心交互</Kicker>
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div className="max-w-2xl">
-            <h1 className="text-[26px] font-semibold leading-tight sm:text-[32px]">
+            <h1 className="editorial-heading text-[30px] sm:text-[37px]">
               {deep.title}
             </h1>
             <p className="mt-2.5 text-[13.5px] leading-[1.85] text-fg-muted">
@@ -188,7 +188,7 @@ export function Deepdive() {
                   <CheckCircle className="h-2.5 w-2.5" />
                   生成中的证据
                 </div>
-                <p className="min-h-[104px] text-[13.5px] leading-[2] text-fg/90">{rendered}</p>
+                <p className="min-h-[104px] text-[15px] leading-[1.9] text-fg/90">{rendered}</p>
               </div>
 
               {/* 进度 */}
@@ -299,7 +299,7 @@ export function Deepdive() {
                       </span>
                     </div>
 
-                    <p className="text-[13.5px] font-medium leading-[1.65]">{q.ask}</p>
+                    <p className="text-[15px] font-semibold leading-relaxed">{q.ask}</p>
 
                     <p className="mt-1.5 flex items-start gap-1.5 text-[11.5px] leading-relaxed text-fg-dim">
                       <Sparkle className="mt-[3px] h-3 w-3 shrink-0 text-brand-500/60" />

@@ -3,7 +3,7 @@
 
 /* ============================================================
    职镜 JobLens · 设计令牌
-   暗色“诊断仪器”风格：低明度底 + 单一高饱和主色 + 四态语义色
+   白底阅读界面：深色正文、蓝色操作和独立的状态色
    ============================================================ */
 @theme {
   --font-sans:
@@ -11,33 +11,36 @@
   --font-mono:
     'Cascadia Mono', ui-monospace, 'SFMono-Regular', Consolas, 'JobLens Text', monospace;
 
-  /* 底色阶 */
-  --color-ink-950: #06070a;
-  --color-ink-900: #0a0c11;
-  --color-ink-850: #0e1117;
-  --color-ink-800: #131722;
-  --color-ink-750: #171c28;
-  --color-ink-700: #1b202c;
-  --color-ink-600: #252b39;
-  --color-ink-500: #333b4c;
+  --font-editorial:
+    'JobLens Display', 'Songti SC', 'Noto Serif CJK SC', 'SimSun', serif;
+
+  /* 浅色表面与描边 */
+  --color-ink-950: #ffffff;
+  --color-ink-900: #f8faff;
+  --color-ink-850: #f2f5fb;
+  --color-ink-800: #eaf0f8;
+  --color-ink-750: #e1e8f3;
+  --color-ink-700: #d3ddeb;
+  --color-ink-600: #bfcde0;
+  --color-ink-500: #8a9ab0;
 
   /* 文字 */
-  --color-fg: #eef1f7;
-  --color-fg-muted: #a8b2c5;
-  --color-fg-dim: #818ca2;
+  --color-fg: #17243a;
+  --color-fg-muted: #41536b;
+  --color-fg-dim: #56677e;
 
   /* 主色 */
-  --color-brand-300: #b4c4ff;
-  --color-brand-400: #92a9ff;
-  --color-brand-500: #6e8bff;
-  --color-brand-600: #5570f0;
-  --color-brand-700: #3f55cc;
+  --color-brand-300: #254c9a;
+  --color-brand-400: #1d43a6;
+  --color-brand-500: #2d56c2;
+  --color-brand-600: #2348ab;
+  --color-brand-700: #193587;
 
   /* 四态语义色 */
-  --color-ok: #3dd68c;
-  --color-warn: #f5b144;
-  --color-bad: #ff6b7a;
-  --color-info: #5bc8e0;
+  --color-ok: #14674b;
+  --color-warn: #8a4c06;
+  --color-bad: #a32f45;
+  --color-info: #1a617c;
 
   --radius-xl2: 1.125rem;
 }
@@ -55,12 +58,7 @@
   }
 
   body {
-    /* 顶部冷光 + 底部压暗，让页面有"光从上方打下来"的方向感 */
     background-color: var(--color-ink-950);
-    background-image:
-      radial-gradient(130% 80% at 50% -12%, rgba(110, 139, 255, 0.075) 0%, transparent 58%),
-      radial-gradient(110% 70% at 50% 108%, rgba(0, 0, 0, 0.5) 0%, transparent 62%);
-    background-attachment: fixed;
     color: var(--color-fg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -70,7 +68,7 @@
 
   ::selection {
     background: color-mix(in srgb, var(--color-brand-500) 38%, transparent);
-    color: #fff;
+    color: var(--color-fg);
   }
 
   /* 键盘可达性：全局焦点环 */
@@ -106,15 +104,16 @@
 }
 
 .hero-title {
-  font-family: 'JobLens Display', 'Songti SC', 'Noto Serif CJK SC', SimSun, serif;
+  font-family: var(--font-editorial);
   font-size: clamp(1.75rem, 8.2vw, 3.5rem);
   font-weight: 600;
   line-height: 1.23;
-  letter-spacing: 0.005em;
+  letter-spacing: 0.015em;
 }
 
 .hero-title-accent {
   display: block;
+  margin-top: 0.12em;
 }
 
 @media (min-width: 64rem) {
@@ -123,24 +122,43 @@
   }
 }
 
+.editorial-heading {
+  font-family: var(--font-editorial);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.38;
+}
+
+.editorial-quote {
+  font-family: var(--font-editorial);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.metric-number {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
+}
+
 /* ---------------- 背景纹理 ---------------- */
 .grid-bg {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.032) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
+    linear-gradient(to right, rgba(46, 83, 143, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(46, 83, 143, 0.1) 1px, transparent 1px);
   background-size: 56px 56px;
   background-position: center center;
 }
 
 .grid-bg-sm {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.024) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.024) 1px, transparent 1px);
+    linear-gradient(to right, rgba(46, 83, 143, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(46, 83, 143, 0.06) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
 .dot-bg {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(46, 83, 143, 0.11) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 
@@ -148,8 +166,8 @@
 .glow-brand {
   background: radial-gradient(
     72% 118% at 28% -18%,
-    rgba(110, 139, 255, 0.28) 0%,
-    rgba(110, 139, 255, 0.09) 42%,
+    rgba(166, 191, 241, 0.38) 0%,
+    rgba(166, 191, 241, 0.14) 42%,
     transparent 72%
   );
 }
@@ -159,8 +177,8 @@
   background: linear-gradient(
     102deg,
     transparent 14%,
-    rgba(146, 169, 255, 0.1) 44%,
-    rgba(146, 169, 255, 0.03) 62%,
+    rgba(155, 190, 255, 0.22) 44%,
+    rgba(155, 190, 255, 0.08) 62%,
     transparent 82%
   );
   filter: blur(28px);
@@ -178,36 +196,15 @@
   border-top: 1px solid color-mix(in srgb, var(--color-ink-600) 60%, transparent);
 }
 
-/* 面板：渐变面 + 顶部内高光 + 双层阴影，制造"浮起来"的材质感 */
 .panel {
-  background: linear-gradient(180deg, #151a25 0%, #0f131b 100%);
-  border: 1px solid #232a38;
-  /* 上边缘更亮 = 被上方光源照到 */
-  border-top-color: rgba(255, 255, 255, 0.11);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.055),
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    0 18px 46px -28px rgba(0, 0, 0, 0.95);
+  background: var(--color-ink-950);
+  border: 1px solid var(--color-ink-700);
+  box-shadow: 0 1px 2px rgba(23, 36, 58, 0.04), 0 16px 32px -24px rgba(40, 67, 108, 0.22);
 }
 
 .panel-flat {
-  background: var(--color-ink-850);
-  border: 1px solid #222836;
-  border-top-color: rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-/* ---------------- 质感层：噪点 / 高光 ---------------- */
-
-/* 全站细噪点。暗色 UI 加一层 3% 的颗粒，能立刻消除"塑料感" */
-.grain {
-  position: fixed;
-  inset: 0;
-  z-index: 55;
-  pointer-events: none;
-  opacity: 0.032;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 160px 160px;
+  background: var(--color-ink-900);
+  border: 1px solid var(--color-ink-700);
 }
 
 /* 底部渐隐，长页面滚动时不至于"硬切" */
@@ -315,8 +312,9 @@
   font-feature-settings: 'tnum' on;
 }
 
-/* 文本渐变 */.text-grad {
-  background: linear-gradient(96deg, #ffffff 0%, #c6d2ff 48%, #8fa6ff 100%);
+/* 标题强调文字 */
+.text-grad {
+  background: linear-gradient(96deg, #172d5e 0%, #254b9f 52%, #335cc2 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -327,6 +325,5 @@
   text-decoration: line-through;
   text-decoration-color: color-mix(in srgb, var(--color-bad) 70%, transparent);
   text-decoration-thickness: 2px;
-  color: color-mix(in srgb, var(--color-bad) 85%, white 15%);
-  opacity: 0.75;
+  color: var(--color-bad);
 }

@@ -5,7 +5,7 @@ import { NAV, navigate } from '../lib/router'
 
 export function NavBar({ route }: { route: string }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-ink-700/70 bg-ink-950/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-ink-700/70 bg-ink-950/95 backdrop-blur-xl">
       <Shell wide className="flex h-16 items-center justify-between gap-6">
         <button
           type="button"
@@ -30,7 +30,7 @@ export function NavBar({ route }: { route: string }) {
                 onClick={() => navigate(item.to)}
                 className={`rounded-lg px-3 py-1.5 text-[13px] transition-colors ${
                   active
-                    ? 'bg-ink-800 text-fg'
+                    ? 'bg-brand-500/10 font-semibold text-brand-400'
                     : 'text-fg-muted hover:bg-ink-850 hover:text-fg'
                 }`}
               >
@@ -133,8 +133,6 @@ export function Page({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      {/* 全站细噪点：固定层，不参与布局与交互 */}
-      <div className="grain" aria-hidden />
       <NavBar route={route} />
       <main className="flex-1">{children}</main>
       {!bare && <Footer />}

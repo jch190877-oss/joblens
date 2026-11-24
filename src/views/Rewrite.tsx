@@ -95,7 +95,7 @@ export function Rewrite() {
         <Kicker className="mb-3">改写工作台</Kicker>
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
           <div className="max-w-2xl">
-            <h1 className="text-[26px] font-semibold leading-tight sm:text-[32px]">
+            <h1 className="editorial-heading text-[30px] sm:text-[38px]">
               采纳之前，先看清它凭什么这么说
             </h1>
             <p className="mt-2.5 text-[13.5px] leading-[1.85] text-fg-muted">
@@ -189,7 +189,7 @@ export function Rewrite() {
         <div className="space-y-3">
           {evidence && (
             <section className="panel rounded-xl border-brand-500/30 p-5">
-              <h2 className="text-[14px] font-semibold">来自经历深挖的证据</h2>
+              <h2 className="text-[17px] font-bold">来自经历深挖的证据</h2>
               <p className="mt-2 text-[13px] leading-relaxed text-fg-muted">
                 根据本案例的追问回答整理，请先核对。下方案例建议供独立对比。
               </p>
@@ -262,19 +262,19 @@ export function Rewrite() {
                       <Doc className="h-2.5 w-2.5" />
                       简历原文
                     </div>
-                    <p className="text-[12.5px] leading-[1.75] text-fg-dim line-through decoration-ink-500 decoration-1">
+                    <p className="text-sm leading-[1.85] text-fg-dim line-through decoration-ink-500 decoration-1">
                       {r.before}
                     </p>
                   </div>
 
                   {/* after */}
-                  <div className="p-5">
+                  <div className="bg-ink-900/75 p-5">
                     <div className="mb-2 flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-widest text-fg-dim">
                       <Sparkle className="h-2.5 w-2.5 text-brand-400" />
                       建议表述
                     </div>
                     <p
-                      className={`text-[12.5px] leading-[1.75] ${
+                      className={`text-sm leading-[1.85] ${
                         isRemove ? 'text-fg-dim' : 'text-fg/95'
                       }`}
                     >
@@ -384,7 +384,7 @@ export function Rewrite() {
       {/* 导出弹层 */}
       {showExport && (
         <div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-ink-950/85 p-5 backdrop-blur-md"
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-fg/40 p-5 backdrop-blur-sm"
           onClick={() => setShowExport(false)}
         >
           <div

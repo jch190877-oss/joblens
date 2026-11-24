@@ -50,7 +50,7 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-brand-500 text-[#08090C] font-semibold hover:bg-brand-400 shadow-[0_8px_28px_-10px] shadow-brand-500/70',
+      'bg-brand-500 text-white font-semibold hover:bg-brand-600 shadow-sm shadow-brand-500/20',
     ghost: 'text-fg-muted hover:text-fg hover:bg-ink-800',
     outline:
       'border border-ink-600 bg-ink-850/60 text-fg hover:border-ink-500 hover:bg-ink-800 backdrop-blur',
@@ -75,7 +75,7 @@ export function Button({
 export function Kicker({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.13em] text-fg-dim ${className}`}
+      className={`inline-flex items-center gap-2 text-[13px] font-semibold tracking-[0.08em] text-brand-300 ${className}`}
     >
       <span className="h-1 w-1 rounded-full bg-brand-500" />
       {children}
@@ -102,7 +102,7 @@ export function Tag({
   }[tone]
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 font-mono text-[10.5px] leading-none tracking-wide ${tones} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[12px] font-medium leading-tight ${tones} ${className}`}
     >
       {children}
     </span>
@@ -191,8 +191,8 @@ export function ScoreDial({
   const dash = c * arc
   const filled = (value / 100) * dash
 
-  const gradFrom = value >= 75 ? '#3dd68c' : value >= 55 ? '#8fa6ff' : '#f5b144'
-  const gradTo = value >= 75 ? '#7ef0b8' : value >= 55 ? '#6e8bff' : '#ffcf7a'
+  const gradFrom = value >= 75 ? '#14674b' : value >= 55 ? '#2d56c2' : '#8a4c06'
+  const gradTo = value >= 75 ? '#2d8b6d' : value >= 55 ? '#6685d6' : '#be7629'
   const tickNum = 27
 
   return (
@@ -254,7 +254,7 @@ export function ScoreDial({
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="tnum flex items-baseline gap-0.5">
-          <span className="text-[46px] font-semibold leading-none tracking-tight">{shown}</span>
+          <span className="metric-number text-[46px] font-semibold leading-none">{shown}</span>
           <span className="text-[14px] font-medium text-fg-dim">/100</span>
         </div>
         <div className="mt-2 text-[11.5px] font-medium tracking-wide text-fg-muted">{label}</div>
@@ -373,8 +373,8 @@ export function SectionHead({
     >
       <div className={isC ? 'max-w-2xl' : 'max-w-2xl'}>
         {kicker && <Kicker className="mb-3">{kicker}</Kicker>}
-        <h2 className="text-[26px] font-semibold leading-[1.25] sm:text-[32px]">{title}</h2>
-        {desc && <p className="mt-3 text-[14.5px] leading-[1.8] text-fg-muted">{desc}</p>}
+        <h2 className="editorial-heading text-[28px] sm:text-[36px]">{title}</h2>
+        {desc && <p className="mt-4 max-w-[64ch] text-base leading-[1.85] text-fg-muted">{desc}</p>}
       </div>
       {action}
     </div>

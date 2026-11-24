@@ -11,7 +11,7 @@ export function Landing() {
   return (
     <>
       {/* ================= HERO ================= */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-gradient-to-b from-ink-850 via-ink-900 to-ink-950">
         <div className="grid-bg absolute inset-0 opacity-[0.55]" />
         <div className="glow-brand pointer-events-none absolute inset-x-0 -top-40 h-[520px] opacity-60" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950" />
@@ -27,7 +27,7 @@ export function Landing() {
                 <span className="hero-title-accent text-grad">讲成值得录用的证据</span>
               </h1>
 
-              <p className="mt-6 max-w-[34rem] text-base leading-[1.85] text-fg-muted">
+              <p className="mt-6 max-w-[35rem] text-[16px] leading-[1.9] sm:text-[17px] text-fg-muted">
                 职镜不会替你编经历。它只做一件事：
                 <span className="text-fg"> 把目标岗位的要求逐条拆开，再把你真实做过的事，一条一条对上。</span>
                 对不上的地方，它不猜——它来问你。
@@ -67,7 +67,7 @@ export function Landing() {
       </section>
 
       {/* ================= 数据条 ================= */}
-      <section className="border-y border-ink-700/70 bg-ink-900/40">
+      <section className="border-y border-ink-700 bg-ink-850/75">
         <Shell>
           <div className="grid grid-cols-2 divide-ink-700/60 sm:grid-cols-4 sm:divide-x">
             {[
@@ -82,7 +82,7 @@ export function Landing() {
                 style={{ animationDelay: `${i * 80}ms` }}
               >
                 <div className="flex items-baseline gap-1">
-                  <span className="tnum text-[30px] font-semibold leading-none">{s.n}</span>
+                  <span className="metric-number text-[35px] font-semibold leading-none text-brand-400">{s.n}</span>
                   <span className="text-[12px] text-fg-dim">{s.u}</span>
                 </div>
                 <div className="mt-2 text-[13px] font-medium">{s.l}</div>
@@ -114,12 +114,12 @@ export function Landing() {
                   <span className="font-mono text-[11px] tracking-[0.2em] text-fg-dim">{p.no}</span>
                   <span className="h-px flex-1 bg-gradient-to-r from-ink-600 to-transparent ltr:ml-3 rtl:mr-3" />
                 </div>
-                <h3 className="text-[16px] font-semibold leading-snug">{p.title}</h3>
-                <p className="mt-2.5 flex-1 text-[13px] leading-[1.8] text-fg-muted">{p.body}</p>
+                <h3 className="text-[18px] font-bold leading-snug">{p.title}</h3>
+                <p className="mt-3 flex-1 text-sm leading-[1.85] text-fg-muted">{p.body}</p>
 
-                <figure className="mt-5 border-l-2 border-brand-500/40 pl-3.5">
+                <figure className="mt-5 rounded-r-lg border-l-2 border-brand-500/45 bg-ink-900 px-4 py-3">
                   <Quote className="mb-1 h-3 w-3 text-brand-500/60" />
-                  <blockquote className="text-[12.5px] leading-[1.75] text-fg/80">
+                  <blockquote className="editorial-quote text-[15px] leading-[1.8] text-brand-300">
                     {p.quote}
                   </blockquote>
                   <figcaption className="mt-2 font-mono text-[10.5px] tracking-wide text-fg-dim">
@@ -152,8 +152,8 @@ export function Landing() {
                     </span>
                     <ArrowRight className="h-3.5 w-3.5 text-ink-500 transition-colors group-hover:text-brand-500" />
                   </div>
-                  <h3 className="text-[15px] font-semibold">{f.title}</h3>
-                  <p className="mt-2 text-[12.5px] leading-[1.8] text-fg-muted">{f.desc}</p>
+                  <h3 className="text-[17px] font-bold">{f.title}</h3>
+                  <p className="mt-2 text-sm leading-[1.8] text-fg-muted">{f.desc}</p>
                 </div>
               ))}
             </div>
@@ -238,7 +238,7 @@ export function Landing() {
         <div className="glow-brand pointer-events-none absolute inset-0 opacity-50" />
         <Shell className="relative py-20 text-center sm:py-24">
           <Kicker className="mb-5 justify-center">研究支撑</Kicker>
-          <h2 className="mx-auto max-w-2xl text-[28px] font-semibold leading-[1.3] sm:text-[34px]">
+          <h2 className="editorial-heading mx-auto max-w-2xl text-[28px] sm:text-[36px]">
             每一条产品规则，都能指回某一句访谈原话
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[14px] leading-[1.85] text-fg-muted">

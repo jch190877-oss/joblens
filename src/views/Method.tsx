@@ -13,7 +13,7 @@ export function Method() {
         {/* 页头 */}
         <div className="max-w-3xl">
           <Kicker className="mb-4">访谈方法论</Kicker>
-          <h1 className="text-[30px] font-semibold leading-[1.22] sm:text-[40px]">
+          <h1 className="editorial-heading text-[32px] sm:text-[42px]">
             我们不是在猜产品该长什么样
           </h1>
           <p className="mt-5 text-[14.5px] leading-[1.9] text-fg-muted">
@@ -101,11 +101,11 @@ export function Method() {
                   </span>
                   <span className="font-mono text-[10px] text-fg-dim">来源 {p.who}</span>
                 </div>
-                <h3 className="text-[15px] font-semibold">{p.title}</h3>
-                <p className="mt-2 text-[12.5px] leading-[1.8] text-fg-muted">{p.desc}</p>
+                <h3 className="text-[17px] font-bold">{p.title}</h3>
+                <p className="mt-2 text-sm leading-[1.8] text-fg-muted">{p.desc}</p>
                 <figure className="mt-4 flex gap-2.5 border-t border-ink-700/60 pt-3.5">
                   <Quote className="mt-0.5 h-3 w-3 shrink-0 text-brand-500/50" />
-                  <blockquote className="text-[12px] leading-[1.75] text-fg/75">
+                  <blockquote className="editorial-quote text-[15px] leading-[1.8] text-brand-300">
                     「{p.quote}」
                   </blockquote>
                 </figure>

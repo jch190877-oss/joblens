@@ -16,14 +16,14 @@ export function Logo({ className = 'h-7 w-7' }: { className?: string }) {
     <svg className={className} viewBox="0 0 32 32" fill="none" aria-hidden>
       <defs>
         <linearGradient id="jl-mark" x1="0" y1="0" x2="32" y2="32">
-          <stop offset="0%" stopColor="#92A9FF" />
-          <stop offset="100%" stopColor="#5570F0" />
+          <stop offset="0%" stopColor="#4E72CB" />
+          <stop offset="100%" stopColor="#2348AB" />
         </linearGradient>
       </defs>
-      <rect x="0.5" y="0.5" width="31" height="31" rx="9" fill="#0E1117" stroke="#252B39" />
+      <rect x="0.5" y="0.5" width="31" height="31" rx="9" fill="#F0F5FF" stroke="#CFDDF2" />
       <circle cx="16" cy="16" r="7.6" stroke="url(#jl-mark)" strokeWidth="2.1" />
-      <circle cx="16" cy="16" r="3" fill="#3DD68C" />
-      <path d="M16 4.6v2.4M16 25v2.4M4.6 16H7M25 16h2.4" stroke="#6E8BFF" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="16" cy="16" r="3" fill="#16865F" />
+      <path d="M16 4.6v2.4M16 25v2.4M4.6 16H7M25 16h2.4" stroke="#2D56C2" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   )
 }

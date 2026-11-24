@@ -101,7 +101,7 @@ export function HeroDemo() {
       <div className="glow-brand pointer-events-none absolute -inset-10 opacity-80 blur-2xl" />
       <div className="light-band pointer-events-none absolute -inset-x-6 -top-10 h-40" />
 
-      <div className="panel relative overflow-hidden rounded-2xl shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]">
+      <div className="panel relative overflow-hidden rounded-2xl shadow-[0_24px_64px_-32px_rgba(36,67,119,0.36)]">
         {/* 标题栏 */}
         <div className="flex items-center justify-between border-b border-ink-700/80 bg-ink-900/60 px-4 py-3">
           <div className="flex items-center gap-2">
@@ -119,15 +119,15 @@ export function HeroDemo() {
 
         {/* 汇总（第 6 步出现，占位始终保留） */}
         <div
-          className={`flex items-center justify-between border-b border-ink-700/60 px-4 py-3.5 transition-all duration-700 ${
+          className={`flex flex-wrap items-center justify-between gap-2 border-b border-ink-700/60 px-4 py-3.5 transition-all duration-700 ${
             at(stage, 6) ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <div className="flex items-baseline gap-2">
-            <span className="tnum text-[26px] font-semibold leading-none">{score}</span>
+            <span className="metric-number text-[32px] font-semibold leading-none text-brand-400">{score}</span>
             <span className="text-[11px] text-fg-dim">/100 综合匹配</span>
           </div>
-          <div className="flex gap-1.5">
+          <div className="flex flex-wrap justify-end gap-1.5">
             <Tag tone="ok">1 满足</Tag>
             <Tag tone="warn">2 部分</Tag>
             <Tag tone="info">2 待核实</Tag>

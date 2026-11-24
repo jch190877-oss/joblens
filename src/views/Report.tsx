@@ -51,7 +51,7 @@ function ReqRow({ r }: { r: Requirement }) {
             <Tag tone={TYPE_META[r.type].tone}>{TYPE_META[r.type].label}</Tag>
             <span className="font-mono text-[10px] text-fg-dim">权重 {r.weight}%</span>
           </div>
-          <p className="text-[13.5px] leading-[1.7] text-fg/90">{r.jdLine}</p>
+          <p className="text-[15px] font-semibold leading-relaxed text-fg">{r.jdLine}</p>
         </div>
         <StatusPill status={r.status} size="sm" />
       </div>
@@ -61,7 +61,7 @@ function ReqRow({ r }: { r: Requirement }) {
         <div
           className={`rounded-lg border px-3.5 py-2.5 ${
             r.evidence && !r.evidence.startsWith('（')
-              ? 'border-ink-700 bg-ink-950/50'
+              ? 'border-ink-700 bg-ink-900'
               : 'border-dashed border-ink-700 bg-transparent'
           }`}
         >
@@ -79,7 +79,7 @@ function ReqRow({ r }: { r: Requirement }) {
         </div>
       </div>
 
-      <p className="mt-3 text-[12px] leading-[1.75] text-fg-muted">{r.note}</p>
+      <p className="mt-3 text-sm leading-[1.8] text-fg-muted">{r.note}</p>
 
       {r.gap && (
         <div className="mt-2.5 flex items-start gap-1.5 rounded-md border border-warn/20 bg-warn/[0.04] px-2.5 py-2">
@@ -143,7 +143,7 @@ export function Report() {
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
               <Kicker className="mb-3">岗位对照报告</Kicker>
-              <h1 className="text-[26px] font-semibold leading-tight sm:text-[32px]">
+              <h1 className="editorial-heading text-[30px] sm:text-[38px]">
                 {current.role}
               </h1>
               <p className="mt-2 text-[13px] text-fg-muted">
@@ -317,7 +317,7 @@ export function Report() {
                   <header className="flex items-center justify-between border-b border-ink-700/70 bg-ink-900/40 px-5 py-3.5 sm:px-6">
                     <div className="flex items-center gap-2.5">
                       <Sparkle className="h-3.5 w-3.5 text-brand-400" />
-                      <h2 className="text-[13.5px] font-semibold">改写前后对照</h2>
+                      <h2 className="text-[16px] font-bold">改写前后对照</h2>
                       <span className="hidden text-[11.5px] text-fg-dim sm:inline">
                         只改表达，不改事实
                       </span>
@@ -376,7 +376,7 @@ export function Report() {
                   <header className="flex items-center justify-between border-b border-ink-700/70 bg-ink-900/40 px-5 py-3.5 sm:px-6">
                     <div className="flex items-center gap-2.5">
                       <Layers className="h-3.5 w-3.5 text-fg-dim" />
-                      <h2 className="text-[13.5px] font-semibold">{g.label}</h2>
+                      <h2 className="text-[16px] font-bold">{g.label}</h2>
                       <span className="text-[11.5px] text-fg-dim">{g.hint}</span>
                     </div>
                     <span className="tnum font-mono text-[11px] text-fg-dim">{list.length}</span>

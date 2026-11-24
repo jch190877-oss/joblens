@@ -66,7 +66,6 @@ export interface Case {
   meta: string
   role: string
   org: string
-  dims: Dimension[]
   resume: string
   jd: string
   requirements: Requirement[]
@@ -153,13 +152,6 @@ const CASE_A: Case = {
   meta: '市场营销 · 大四 · 已有一段车企实习',
   role: '产品运营实习生',
   org: '某互联网公司 · 内容生态方向',
-  dims: [
-    { key: 'match', label: '岗位匹配度', score: 62, basis: '7 条要求中 2 条完全满足、3 条部分满足' },
-    { key: 'rel', label: '经历相关性', score: 71, basis: '存在可复用经历，但未按岗位语言重写' },
-    { key: 'result', label: '成果体现程度', score: 48, basis: '全文仅 1 处量化，且缺少基线' },
-    { key: 'expr', label: '表达专业度', score: 58, basis: '动词层级偏低，多为「参与」「协助」' },
-    { key: 'struct', label: '结构规范性', score: 68, basis: '模块齐全，但与岗位最相关的经历不在首屏' },
-  ],
   resume: `李同学 ｜ 市场营销（商学院） ｜ 2021级本科 ｜ 大四
 求职意向：市场营销 / 运营类实习生
 
@@ -442,13 +434,6 @@ const CASE_B: Case = {
   meta: '软件工程 · 大二 · 商赛通道拿到实习',
   role: 'IT 审计实习生',
   org: '某公司 · 风险与鉴证方向',
-  dims: [
-    { key: 'match', label: '岗位匹配度', score: 55, basis: '技术能力对口，但审计场景证据薄弱' },
-    { key: 'rel', label: '经历相关性', score: 63, basis: '爬虫与数据处理经历高度相关，写法过于笼统' },
-    { key: 'result', label: '成果体现程度', score: 34, basis: '全部经历无一处量化，无交付物描述' },
-    { key: 'expr', label: '表达专业度', score: 46, basis: '停留在「会写程序」层级，未体现方法与工具' },
-    { key: 'struct', label: '结构规范性', score: 66, basis: '结构完整，但缺少技能与项目成果模块' },
-  ],
   resume: `陈同学 ｜ 软件工程 ｜ 2025级本科 ｜ 大二
 求职意向：IT 审计 / 数据分析方向实习
 
@@ -716,13 +701,6 @@ const CASE_C: Case = {
   meta: '英语（英语教育） · 大四 · 教培方向',
   role: '英语教师（教培）',
   org: '某教培机构 · 中小学英语',
-  dims: [
-    { key: 'match', label: '岗位匹配度', score: 74, basis: '专业与证书齐全，授课经验偏薄' },
-    { key: 'rel', label: '经历相关性', score: 72, basis: '教学实践存在，但只写到「参与」层面' },
-    { key: 'result', label: '成果体现程度', score: 55, basis: '有过程无结果，无学生反馈与效果数据' },
-    { key: 'expr', label: '表达专业度', score: 66, basis: '术语使用规范，但动词层级低' },
-    { key: 'struct', label: '结构规范性', score: 78, basis: '结构清晰，教育背景与证书位置合理' },
-  ],
   resume: `冯同学 ｜ 英语（英语教育） ｜ 2021级本科 ｜ 大四
 求职意向：教培机构英语教师
 
@@ -1071,49 +1049,43 @@ export interface WeightRow {
 
 export const HR_WEIGHTS: WeightRow[] = [
   {
-    dim: '硬性条件',
+    dim: '门槛达成',
     q: '学历、专业、证书、语言、年限是否满足',
     field: '岗位要求 · 满足状态',
-    w: 25,
-    basis: '两位 HR 都确认初筛先看硬性条件，权重不变',
+    w: 28,
+    wNew: 30,
+    basis: '两位 HR 都确认「初筛先看硬性条件」，作为门槛而非普通评分项，权重上调',
   },
   {
-    dim: '经历相关性',
-    q: '经历是否支持目标岗位职责',
+    dim: '相关经历',
+    q: '核心职责是否有对应经历与证据',
     field: '原文依据 · 相关性说明',
-    w: 25,
-    basis: '仍为最高权重，但拆成「类型权重 × 内容质量」两项分别计算',
+    w: 32,
+    wNew: 35,
+    basis: '两位 HR 都把相关实习列为首要加分项，是权重最高的一项',
   },
   {
-    dim: '个人贡献',
-    q: '能否区分本人动作与团队成果',
-    field: '个人职责 · 平台 or 个人',
-    w: 15,
-    wNew: 20,
-    basis: 'HR02 明确提出「平台 ≠ 个人能力」，从 15% 上调到 20%',
+    dim: '加分储备',
+    q: '加分项（内容作品、附加证书等）是否具备',
+    field: '加分项 · 达成状态',
+    w: 12,
+    wNew: 10,
+    basis: '属于「同等条件下拉开差距」，不构成门槛，权重略降',
   },
   {
-    dim: '结果信息',
-    q: '是否包含规模、对象、周期、结果或反馈',
-    field: '量化缺口 · 待补充问题',
-    w: 20,
-    basis: '不变。但改写模板增加「困难 → 解法」，不再只写结果',
+    dim: '表达与结构',
+    q: '信息是否清晰、重点是否前置、是否适合 ATS',
+    field: '投递前检查 · 版式建议',
+    w: 18,
+    wNew: 15,
+    basis: 'HR01 要层级清晰，HR02「能看明白就行」——重要但不应盖过内容',
   },
   {
-    dim: '表达与版式',
-    q: '信息是否易读、重点是否前置、是否适合 ATS',
-    field: '结构检查 · 版式建议',
-    w: 10,
-    wNew: 8,
-    basis: 'HR02「能看明白就行」；HR01 要层级清晰但不要花哨，权重略降',
-  },
-  {
-    dim: '可信度与风险',
+    dim: '可信度',
     q: '是否存在新增事实、夸大或无法核实的信息',
     field: '规则编号 · 事实安全提醒',
-    w: 5,
-    wNew: 7,
-    basis: 'HR02 提醒学历筛选与个人判断的差别，可核验性更受重视',
+    w: 10,
+    basis: 'HR02 提到学历筛选与个人判断的差别，可核验性已包含在门槛与经历两项中，暂不上调',
   },
 ]
 

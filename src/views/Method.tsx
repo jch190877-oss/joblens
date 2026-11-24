@@ -300,8 +300,9 @@ export function Method() {
           <p className="mt-4 flex items-start gap-2 text-[11.5px] leading-relaxed text-fg-dim">
             <Layers className="mt-[2px] h-3 w-3 shrink-0" />
             <span>
-              初始权重来自学生访谈的编码结果；HR 校准来自 2 位招聘者的说明，样本仅覆盖教育行业。
-              两项上调（个人贡献 15%→20%、可信度 5%→7%）直接来自 HR 的原话，其余保持不变。
+              初始权重来自学生访谈的编码结果；HR 校准来自 2 位招聘者的定性说明，样本仅覆盖教育行业。
+              门槛达成与相关经历上调、加分与表达下调，三项调整都能指回原话。
+              权重目前仍是**专家初值 + HR 定性校准**，尚未用 AHP 做正式标定（工具已就绪，见 docs/ahp）。
               分数用于定位问题、排序修改优先级，不用于预测录用结果。
             </span>
           </p>

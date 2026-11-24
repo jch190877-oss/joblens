@@ -35,6 +35,8 @@ export interface PreflightCheck {
   label: string
   status: CheckStatus
   detail: string
+  /** presentation 计入「表达与结构」维度；content 只作提示，不计分 */
+  kind?: 'presentation' | 'content'
 }
 
 export interface HrProfile {
@@ -219,6 +221,7 @@ const C: HrProfile = {
       id: 'c-c3',
       label: '岗位核心能力覆盖',
       status: 'fail',
+      kind: 'content',
       detail: 'JD 第 3 条「与家长沟通」在简历中完全没有对应内容。教培岗位的续费率几乎完全取决于家长沟通，这条不能空着。',
     },
     {

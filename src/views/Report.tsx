@@ -24,6 +24,7 @@ import {
 import { navigate } from '../lib/router'
 import { Reveal } from '../components/Reveal'
 import { CASES, scoreOf, type Requirement } from '../data/demo'
+import { dimsOf } from '../lib/scoring'
 import { HR_BY_CASE, VERDICT_META, CHECK_META } from '../data/hr'
 import { setCaseId, useCase, useCaseId } from '../lib/store'
 
@@ -124,6 +125,9 @@ export function Report() {
   const mixMax = Math.max(1, ...(hr ? hr.expMix.map((m) => m.count * m.weight) : [1]))
   const checkPass = hr ? hr.checks.filter((c) => c.status === 'pass').length : 0
 
+  // 诊断维度全部由判定算出，不再手写
+  const dims = useMemo(() => dimsOf(current, hr), [current, hr])
+
   const groups = [
     { key: 'hard', label: '硬性条件', hint: '不满足则直接出局' },
     { key: 'core', label: '核心职责', hint: '决定竞争力上限' },
@@ -223,10 +227,10 @@ export function Report() {
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
                       诊断维度
                     </span>
-                    <span className="font-mono text-[10px] text-fg-dim">独立评估 · 不参与总分</span>
+                    <span className="font-mono text-[10px] text-fg-dim">由判定实时计算</span>
                   </div>
                   <div className="space-y-3">
-                    {current.dims.map((d, i) => (
+                    {dims.map((d, i) => (
                       <Meter
                         key={d.key}
                         label={d.label}

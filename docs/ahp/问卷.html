@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>职镜 JobLens · 评价维度权重问卷（AHP）</title>
+    <style>
+      :root {
+        --ink: #17243a;
+        --muted: #56677e;
+        --line: #d3ddeb;
+        --brand: #2d56c2;
+        --bg: #f8faff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 32px 20px 64px;
+        font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+        color: var(--ink);
+        background: #fff;
+        line-height: 1.7;
+        font-size: 15px;
+      }
+      .wrap { max-width: 860px; margin: 0 auto; }
+      h1 { font-size: 24px; margin: 0 0 6px; letter-spacing: -0.01em; }
+      .sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+      h2 {
+        font-size: 15px;
+        margin: 34px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--line);
+      }
+      p.lead { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+      .bar {
+        display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+        margin-bottom: 18px; padding: 12px 14px; background: var(--bg);
+        border: 1px solid var(--line); border-radius: 8px;
+      }
+      .bar input { height: 32px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
+      button {
+        height: 32px; padding: 0 14px; border: 0; border-radius: 6px;
+        background: var(--brand); color: #fff; font-size: 13px; cursor: pointer;
+      }
+      button.ghost { background: #fff; color: var(--brand); border: 1px solid var(--brand); }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+      th { font-weight: 600; color: var(--muted); font-size: 12px; }
+      td.q { width: 46%; }
+      select { height: 30px; padding: 0 6px; border: 1px solid var(--line); border-radius: 5px; font-size: 12.5px; width: 100%; }
+      .hint { color: var(--muted); font-size: 12px; }
+      .num { font-variant-numeric: tabular-nums; text-align: right; }
+      .ok { color: #14674b; font-weight: 600; }
+      .bad { color: #a32f45; font-weight: 600; }
+      .out {
+        margin-top: 14px; padding: 16px; border: 1px solid var(--line);
+        border-radius: 8px; background: var(--bg);
+      }
+      .out .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+      .out .row b { font-variant-numeric: tabular-nums; }
+      code { background: #eef3fb; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+      @media print {
+        body { padding: 0; font-size: 12px; }
+        .bar, .no-print { display: none !important; }
+        h1 { font-size: 18px; }
+        select { border: 1px solid #999; }
+        .out { background: #fff; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>评价维度权重问卷（AHP）</h1>
+      <p class="sub">
+        职镜 JobLens · 用于确定 5 个评价维度的相对权重。填写约需 5 分钟。<br />
+        填完点「计算权重」，或打印出来手填后再录入。
+      </p>
+
+      <div class="bar no-print">
+        <label>受访者编号&nbsp;<input id="expert" value="HR01" size="8" /></label>
+        <button onclick="compute()">计算权重</button>
+        <button class="ghost" onclick="window.print()">打印</button>
+        <button class="ghost" onclick="exportJson()">导出 JSON</button>
+        <span class="hint" id="status"></span>
+      </div>
+
+      <h2>填写说明</h2>
+      <p class="lead">
+        下面每一行是「维度 A」与「维度 B」的两两比较。请判断：<b>在你筛简历时，A 相对于 B 重要多少倍</b>。<br />
+        1 = 同等重要；3 = 稍微重要；5 = 明显重要；7 = 强烈重要；9 = 极端重要；2/4/6/8 为中间值。反向则选「B 更重要」的一侧。
+      </p>
+
+      <h2>两两比较</h2>
+      <table id="cmp">
+        <thead>
+          <tr><th>比较</th><th>判断</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <h2>计算结果</h2>
+      <div class="out" id="out">
+        <p class="hint" style="margin: 0">填写后点「计算权重」。</p>
+      </div>
+
+      <h2>方法说明</h2>
+      <p class="lead">
+        采用 Saaty 层次分析法：由判断矩阵求最大特征值对应的特征向量，归一化后即为权重。
+        一致性指标 <code>CI = (λmax − n) / (n − 1)</code>，
+        一致性比率 <code>CR = CI / RI</code>。当 <code>CR &lt; 0.1</code> 时，视为判断前后自洽、可接受。
+        若 CR ≥ 0.1，说明存在互相矛盾的判断（例如 A 比 B 重要、B 比 C 重要，却又说 C 比 A 重要），需要回看并调整。
+      </p>
+      <p class="lead">
+        n=5 时 RI = 1.12。两位 HR 分别填写后，用几何平均合并两人的判断矩阵，再求一次权重，可减少个人偏好影响。
+      </p>
+    </div>
+
+    <script>
+      const DIMS = [
+        { key: 'gate', label: '门槛达成', desc: '学历/专业/语言等硬性条件是否满足' },
+        { key: 'core', label: '相关经历', desc: '核心职责是否有对应经历与证据' },
+        { key: 'bonus', label: '加分储备', desc: '加分项是否具备' },
+        { key: 'format', label: '表达与结构', desc: '信息是否清晰、重点是否前置' },
+        { key: 'trust', label: '可信度', desc: '是否存在无法核实或被夸大的信息' },
+      ]
+      const RI = { 1: 0, 2: 0, 3: 0.58, 4: 0.9, 5: 1.12, 6: 1.24, 7: 1.32, 8: 1.41, 9: 1.45, 10: 1.49 }
+
+      const PAIRS = []
+      for (let i = 0; i < DIMS.length; i++)
+        for (let j = i + 1; j < DIMS.length; j++) PAIRS.push([i, j])
+
+      const SCALE = [
+        [1 / 9, '9 — 后者极端重要'],
+        [1 / 7, '7 — 后者强烈重要'],
+        [1 / 5, '5 — 后者明显重要'],
+        [1 / 3, '3 — 后者稍微重要'],
+        [1, '1 — 同等重要'],
+        [3, '3 — 前者稍微重要'],
+        [5, '5 — 前者明显重要'],
+        [7, '7 — 前者强烈重要'],
+        [9, '9 — 前者极端重要'],
+      ]
+
+      const tbody = document.querySelector('#cmp tbody')
+      PAIRS.forEach(([i, j], k) => {
+        const tr = document.createElement('tr')
+        const opts = SCALE.map(
+          ([v, t]) => `<option value="${v}"${v === 1 ? ' selected' : ''}>${t}</option>`,
+        ).join('')
+        tr.innerHTML = `
+          <td class="q">
+            <b>${DIMS[i].label}</b> <span class="hint">（${DIMS[i].desc}）</span><br />
+            对比 <b>${DIMS[j].label}</b> <span class="hint">（${DIMS[j].desc}）</span>
+          </td>
+          <td><select data-k="${k}">${opts}</select></td>`
+        tbody.appendChild(tr)
+      })
+
+      function matrix() {
+        const n = DIMS.length
+        const m = Array.from({ length: n }, () => Array(n).fill(1))
+        document.querySelectorAll('#cmp select').forEach((s) => {
+          const [i, j] = PAIRS[+s.dataset.k]
+          const v = parseFloat(s.value)
+          m[i][j] = v
+          m[j][i] = 1 / v
+        })
+        return m
+      }
+
+      // 幂迭代求主特征向量
+      function eigen(m) {
+        const n = m.length
+        let w = Array(n).fill(1 / n)
+        for (let iter = 0; iter < 200; iter++) {
+          const nw = m.map((row) => row.reduce((s, v, j) => s + v * w[j], 0))
+          const sum = nw.reduce((a, b) => a + b, 0)
+          w = nw.map((v) => v / sum)
+        }
+        const lambda = m.reduce((s, row, i) => s + row.reduce((t, v, j) => t + v * w[j], 0) / w[i], 0) / n
+        return { w, lambda }
+      }
+
+      function compute() {
+        const m = matrix()
+        const { w, lambda } = eigen(m)
+        const n = m.length
+        const CI = (lambda - n) / (n - 1)
+        const CR = CI / RI[n]
+        const ok = CR < 0.1
+
+        document.getElementById('out').innerHTML = `
+          ${DIMS.map(
+            (d, i) => `<div class="row"><span>${d.label}</span><b>${(w[i] * 100).toFixed(1)}%</b></div>`,
+          ).join('')}
+          <div class="row" style="border-top:1px solid #d3ddeb;margin-top:8px;padding-top:8px">
+            <span>λmax</span><b>${lambda.toFixed(4)}</b>
+          </div>
+          <div class="row"><span>CI</span><b>${CI.toFixed(4)}</b></div>
+          <div class="row"><span>CR（RI = ${RI[n]}）</span>
+            <b class="${ok ? 'ok' : 'bad'}">${CR.toFixed(4)} ${ok ? '· 通过' : '· 未通过，请检查判断是否矛盾'}</b>
+          </div>`
+        document.getElementById('status').textContent = ok ? '一致性通过' : 'CR ≥ 0.1，建议调整'
+      }
+
+      let lastResult = null
+      const _compute = compute
+      compute = function () {
+        _compute()
+        const m = matrix()
+        const { w, lambda } = eigen(m)
+        const n = m.length
+        const CI = (lambda - n) / (n - 1)
+        lastResult = { expert: document.getElementById('expert').value, dims: DIMS.map((d) => d.key), matrix: m, weights: w, lambda, CI, CR: CI / RI[n] }
+      }
+
+      function exportJson() {
+        if (!lastResult) compute()
+        const blob = new Blob([JSON.stringify(lastResult, null, 2)], { type: 'application/json' })
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = `${lastResult.expert || 'ahp'}.json`
+        a.click()
+      }
+
+      compute()
+    </script>
+  </body>
+</html>

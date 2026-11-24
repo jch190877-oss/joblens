@@ -66,7 +66,6 @@ export interface Case {
   meta: string
   role: string
   org: string
-  score: number
   dims: Dimension[]
   resume: string
   jd: string
@@ -75,6 +74,71 @@ export interface Case {
   rewrites: Rewrite[]
   deep: DeepBlock
   hrFold: string[]
+}
+
+/* ================================================================
+   总分计算
+   总分 = Σ(归一化权重 × 四态达成度)
+   硬性条件不满足 → 门槛优先，总分封顶 40
+   ================================================================ */
+
+/** 四态对应的达成度分值 */
+export const STATUS_SCORE: Record<Status, number> = {
+  met: 1,
+  partial: 0.5,
+  unverified: 0.2,
+  missing: 0,
+}
+
+export interface ScoreRow {
+  id: string
+  rule: string
+  type: ReqType
+  jdLine: string
+  /** 归一化后的权重，同一案例内合计 100 */
+  weight: number
+  status: Status
+  statusScore: number
+  gained: number
+  lost: number
+}
+
+export interface ScoreResult {
+  /** 最终显示分（已考虑硬性门槛） */
+  value: number
+  /** 未封顶的原始加权分 */
+  raw: number
+  hardFail: boolean
+  rows: ScoreRow[]
+  /** 失分最多的一条 */
+  biggestLoss: ScoreRow | null
+}
+
+export function scoreOf(c: Case): ScoreResult {
+  const sum = c.requirements.reduce((s, r) => s + r.weight, 0) || 100
+  const rows: ScoreRow[] = c.requirements.map((r) => {
+    const weight = (r.weight / sum) * 100
+    const statusScore = STATUS_SCORE[r.status]
+    const gained = weight * statusScore
+    return {
+      id: r.id,
+      rule: r.rule,
+      type: r.type,
+      jdLine: r.jdLine,
+      weight,
+      status: r.status,
+      statusScore,
+      gained,
+      lost: weight - gained,
+    }
+  })
+
+  const raw = rows.reduce((s, r) => s + r.gained, 0)
+  const hardFail = c.requirements.some((r) => r.type === 'hard' && r.status === 'missing')
+  const value = Math.round(hardFail ? Math.min(raw, 40) : raw)
+  const biggestLoss = [...rows].sort((a, b) => b.lost - a.lost)[0] ?? null
+
+  return { value, raw, hardFail, rows, biggestLoss }
 }
 
 /* ================================================================
@@ -89,7 +153,6 @@ const CASE_A: Case = {
   meta: '市场营销 · 大四 · 已有一段车企实习',
   role: '产品运营实习生',
   org: '某互联网公司 · 内容生态方向',
-  score: 64,
   dims: [
     { key: 'match', label: '岗位匹配度', score: 62, basis: '7 条要求中 2 条完全满足、3 条部分满足' },
     { key: 'rel', label: '经历相关性', score: 71, basis: '存在可复用经历，但未按岗位语言重写' },
@@ -140,7 +203,7 @@ const CASE_A: Case = {
       id: 'A0',
       type: 'hard',
       jdLine: '本科及以上在读，可实习 3 个月以上，每周到岗 4 天',
-      weight: 25,
+      weight: 20,
       status: 'met',
       evidence: '2021级本科 ｜ 大四',
       note: '大四课程已结束，可满足 3 个月以上、每周 4 天到岗。建议在简历顶部直接写明可实习时段。',
@@ -150,7 +213,7 @@ const CASE_A: Case = {
       id: 'A1',
       type: 'core',
       jdLine: '根据产品特性和目标用户，策划并撰写运营脚本（短视频 / 图文）',
-      weight: 25,
+      weight: 22,
       status: 'met',
       evidence: '参与社交媒体内容运营，撰写图文',
       note: '你访谈中提到为 B 端制造业客户撰写解决方案类文章写了约三个月、并出过爆款——这正是这条要求要的能力，但简历里被「参与」两个字吃掉了。',
@@ -171,7 +234,7 @@ const CASE_A: Case = {
       id: 'A3',
       type: 'core',
       jdLine: '分析运营数据，输出内容复盘报告',
-      weight: 20,
+      weight: 18,
       status: 'partial',
       evidence: '（简历中无对应内容）',
       note: '你提到「出过一些流量比较好的爆款」，但没有写数据口径、也没体现复盘动作。',
@@ -182,7 +245,7 @@ const CASE_A: Case = {
       id: 'A4',
       type: 'core',
       jdLine: '与产品、设计协作，跟进内容从策划到上线的全流程',
-      weight: 15,
+      weight: 12,
       status: 'unverified',
       evidence: '（简历中无对应内容）',
       note: '经历里可能出现跨部门协作，但简历完全没有体现。属于「做过但没写」。',
@@ -193,7 +256,7 @@ const CASE_A: Case = {
       id: 'A5',
       type: 'plus',
       jdLine: '有内容作品者优先',
-      weight: 10,
+      weight: 5,
       status: 'partial',
       evidence: '参与社交媒体内容运营，撰写图文',
       note: '提到了内容工作，但没有作品链接。这条几乎零成本可以补上。',
@@ -204,7 +267,7 @@ const CASE_A: Case = {
       id: 'A6',
       type: 'plus',
       jdLine: '熟练使用剪映 / PS 等基础工具',
-      weight: 5,
+      weight: 3,
       status: 'met',
       evidence: '熟练使用 Office、剪映',
       note: '已有剪映，建议补一句实际产出（剪辑过什么、时长、条数）。',
@@ -379,7 +442,6 @@ const CASE_B: Case = {
   meta: '软件工程 · 大二 · 商赛通道拿到实习',
   role: 'IT 审计实习生',
   org: '某公司 · 风险与鉴证方向',
-  score: 57,
   dims: [
     { key: 'match', label: '岗位匹配度', score: 55, basis: '技术能力对口，但审计场景证据薄弱' },
     { key: 'rel', label: '经历相关性', score: 63, basis: '爬虫与数据处理经历高度相关，写法过于笼统' },
@@ -424,7 +486,7 @@ Python、Java、MySQL`,
       id: 'B0',
       type: 'hard',
       jdLine: '本科在读，计算机 / 信息管理 / 财会相关专业',
-      weight: 25,
+      weight: 22,
       status: 'met',
       evidence: '软件工程 ｜ 2025级本科',
       note: '专业完全对口。这是你唯一的「硬性条件满分项」，建议在第一行就写清专业与年级。',
@@ -434,7 +496,7 @@ Python、Java、MySQL`,
       id: 'B1',
       type: 'core',
       jdLine: '使用 SQL / Python 提取、清洗、分析业务数据，形成审计底稿',
-      weight: 25,
+      weight: 28,
       status: 'partial',
       evidence: '会编写一些程序，通过程序获取客户的联系方式',
       note: '这是你的主战场，也是最大的浪费：只写了「会编写一些程序」，没有语言、没有数据量、没有清洗逻辑、没有交付物。',
@@ -456,7 +518,7 @@ Python、Java、MySQL`,
       id: 'B3',
       type: 'core',
       jdLine: '与业务部门沟通，理解客户需求并转化为可执行的检查方案',
-      weight: 15,
+      weight: 12,
       status: 'unverified',
       evidence: '（简历中无对应内容）',
       note: '你访谈里提到为做商赛去问了学长学姐、了解岗位职责——这体现了信息获取能力，但没有沉到简历里。',
@@ -467,7 +529,7 @@ Python、Java、MySQL`,
       id: 'B4',
       type: 'core',
       jdLine: '参与产品用户反馈收集，梳理需求并输出说明文档',
-      weight: 15,
+      weight: 10,
       status: 'partial',
       evidence: '参与家乡非遗特色饮品的品牌推广 · 负责部分技术工作',
       note: '你访谈里讲到这个项目做过核心用户画像和竞品分析——这正好对应「用户反馈收集」，但简历写成了「负责部分技术工作」。',
@@ -478,7 +540,7 @@ Python、Java、MySQL`,
       id: 'B5',
       type: 'plus',
       jdLine: '熟悉数据库原理，具备脚本编写能力者优先',
-      weight: 10,
+      weight: 8,
       status: 'met',
       evidence: 'Python、Java、MySQL',
       note: '技能列表有了，但与经历割裂。建议在项目 bullet 里出现具体工具，而不是只在末尾罗列。',
@@ -654,7 +716,6 @@ const CASE_C: Case = {
   meta: '英语（英语教育） · 大四 · 教培方向',
   role: '英语教师（教培）',
   org: '某教培机构 · 中小学英语',
-  score: 69,
   dims: [
     { key: 'match', label: '岗位匹配度', score: 74, basis: '专业与证书齐全，授课经验偏薄' },
     { key: 'rel', label: '经历相关性', score: 72, basis: '教学实践存在，但只写到「参与」层面' },
@@ -700,7 +761,7 @@ const CASE_C: Case = {
       id: 'C0',
       type: 'hard',
       jdLine: '本科及以上学历，英语相关专业，专八或同等水平优先',
-      weight: 25,
+      weight: 18,
       status: 'met',
       evidence: '英语（英语教育）专业 ｜ 英语专业八级',
       note: '硬性条件完全满足，且是本案例最强项。建议在简历首行直接给出一句话定位。',
@@ -710,7 +771,7 @@ const CASE_C: Case = {
       id: 'C1',
       type: 'hard',
       jdLine: '持有教师资格证，有授课经验者优先',
-      weight: 20,
+      weight: 14,
       status: 'met',
       evidence: '高中英语教师资格证',
       note: '证书齐备。注意：证书是门槛不是优势，不要把版面让给证书清单。',
@@ -720,7 +781,7 @@ const CASE_C: Case = {
       id: 'C2',
       type: 'core',
       jdLine: '独立完成备课、授课与课后反馈',
-      weight: 25,
+      weight: 22,
       status: 'partial',
       evidence: '独立完成 2 次课堂试讲',
       note: '有授课动作，但没有说清课型、学生规模、内容与反馈。「2 次试讲」不足以支撑「独立授课」。',
@@ -731,7 +792,7 @@ const CASE_C: Case = {
       id: 'C3',
       type: 'core',
       jdLine: '依据教学大纲设计教案与课堂活动，保证课堂互动与学习效果',
-      weight: 20,
+      weight: 18,
       status: 'partial',
       evidence: '撰写教学日志与课后反思',
       note: '教学日志是你反思能力的证据，但你访谈里说 AI 想把这些全部堆上去、你自己删减了——正确做法不是删，而是只留能证明变化的那一条。',
@@ -742,7 +803,7 @@ const CASE_C: Case = {
       id: 'C4',
       type: 'core',
       jdLine: '与家长保持沟通，反馈学员学习情况并给出提升建议',
-      weight: 15,
+      weight: 16,
       status: 'missing',
       evidence: '（简历中无对应内容）',
       note: '这是教培岗位的核心差异点——续费率几乎完全取决于家长沟通。目前证据为零。',
@@ -753,7 +814,7 @@ const CASE_C: Case = {
       id: 'C5',
       type: 'core',
       jdLine: '参与教研活动，打磨课件与教学方法',
-      weight: 10,
+      weight: 8,
       status: 'unverified',
       evidence: '（简历中无对应内容）',
       note: '实习期间是否参加过教研组活动？如果有，这是能区别于纯家教的关键证据。',
@@ -764,7 +825,7 @@ const CASE_C: Case = {
       id: 'C6',
       type: 'plus',
       jdLine: '沟通表达清晰，有责任心',
-      weight: 5,
+      weight: 4,
       status: 'unverified',
       evidence: '（简历中无对应内容）',
       note: '这类软性要求不靠形容词证明，靠场景。若补上家长沟通那条，这条会自然成立。',

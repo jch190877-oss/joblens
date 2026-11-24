@@ -12,8 +12,10 @@ import {
 import {
   ArrowRight,
   Chat,
+  ChevronRight,
   Doc,
   Download,
+  Gauge,
   Layers,
   Shield,
   Sparkle,
@@ -21,7 +23,7 @@ import {
 } from '../components/icons'
 import { navigate } from '../lib/router'
 import { Reveal } from '../components/Reveal'
-import { CASES, type Requirement } from '../data/demo'
+import { CASES, scoreOf, type Requirement } from '../data/demo'
 import { HR_BY_CASE, VERDICT_META, CHECK_META } from '../data/hr'
 import { setCaseId, useCase, useCaseId } from '../lib/store'
 
@@ -105,11 +107,8 @@ export function Report() {
     return s
   }, [current])
 
-  // 失分最严重的维度，用一句话点出来
-  const weakest = useMemo(
-    () => [...current.dims].sort((a, b) => a.score - b.score)[0],
-    [current],
-  )
+  // 总分完全由四态判定加权得出，不再手写
+  const sc = useMemo(() => scoreOf(current), [current])
 
   // 挑一条最有代表性的改写做前后对照
   const featured = useMemo(
@@ -199,27 +198,32 @@ export function Report() {
               <div className="grid gap-7 p-6 sm:grid-cols-[188px_1fr] sm:gap-9">
                 {/* 左：分数 + 一句话结论 */}
                 <div className="flex flex-col items-center gap-4 sm:items-start">
-                  <ScoreDial value={current.score} sub={current.code} />
-                  <div className="w-full rounded-lg border border-ink-700/70 bg-ink-950/40 px-3 py-2.5">
+                  <ScoreDial value={sc.value} sub={current.code} />
+                  <div className="w-full rounded-lg border border-ink-700/70 bg-ink-900/60 px-3 py-2.5">
                     <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-fg-dim">
                       主要失分
                     </div>
                     <div className="mt-1 flex items-baseline justify-between gap-2">
-                      <span className="text-[12.5px] font-medium text-warn">{weakest.label}</span>
-                      <span className="tnum font-mono text-[12.5px] text-warn/80">
-                        {weakest.score}
+                      <span className="text-[12px] font-medium text-warn">
+                        {sc.biggestLoss?.rule ?? '—'}
+                      </span>
+                      <span className="tnum font-mono text-[12px] text-warn/80">
+                        −{(sc.biggestLoss?.lost ?? 0).toFixed(1)}
                       </span>
                     </div>
+                    <p className="mt-1 line-clamp-2 text-[10.5px] leading-relaxed text-fg-dim">
+                      {sc.biggestLoss?.jdLine}
+                    </p>
                   </div>
                 </div>
 
-                {/* 右：五维 */}
+                {/* 右：诊断维度 */}
                 <div className="min-w-0">
                   <div className="mb-3.5 flex items-center justify-between">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
-                      五维评分
+                      诊断维度
                     </span>
-                    <span className="font-mono text-[10px] text-fg-dim">权重见方法论</span>
+                    <span className="font-mono text-[10px] text-fg-dim">独立评估 · 不参与总分</span>
                   </div>
                   <div className="space-y-3">
                     {current.dims.map((d, i) => (
@@ -264,6 +268,90 @@ export function Report() {
                     ))}
                 </div>
               </div>
+
+              {/* 总分推导 */}
+              <details className="group border-t border-ink-700/70">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-3.5 transition-colors hover:bg-ink-900/50">
+                  <span className="flex items-center gap-2 text-[12.5px] font-medium text-fg">
+                    <Gauge className="h-3.5 w-3.5 text-fg-dim" />
+                    总分怎么算出来的
+                  </span>
+                  <span className="flex items-center gap-2 font-mono text-[10.5px] text-fg-dim">
+                    Σ 权重 × 达成度
+                    <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
+                  </span>
+                </summary>
+
+                <div className="border-t border-ink-700/50 px-6 py-4">
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] border-collapse text-left text-[11.5px]">
+                      <thead>
+                        <tr className="text-[10px] tracking-wider text-fg-dim">
+                          <th className="py-1.5 pr-3 text-left font-medium">规则</th>
+                          <th className="py-1.5 pr-3 text-left font-medium">要求</th>
+                          <th className="py-1.5 pr-3 text-right font-medium">权重</th>
+                          <th className="py-1.5 pr-3 text-left font-medium">判定</th>
+                          <th className="py-1.5 pr-3 text-right font-medium">达成度</th>
+                          <th className="py-1.5 text-right font-medium">得分</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sc.rows.map((r) => (
+                          <tr key={r.id} className="border-t border-ink-700/40">
+                            <td className="py-2 pr-3 font-mono text-[10px] text-fg-dim">{r.rule}</td>
+                            <td className="max-w-[240px] truncate py-2 pr-3 text-fg-muted">
+                              {r.jdLine}
+                            </td>
+                            <td className="tnum py-2 pr-3 text-right text-fg-muted">
+                              {r.weight.toFixed(1)}
+                            </td>
+                            <td className="py-2 pr-3">
+                              <StatusPill status={r.status} size="sm" />
+                            </td>
+                            <td className="tnum py-2 pr-3 text-right text-fg-dim">
+                              ×{r.statusScore}
+                            </td>
+                            <td className="tnum py-2 text-right font-medium text-fg">
+                              {r.gained.toFixed(1)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="border-t border-ink-600">
+                          <td colSpan={5} className="py-2 pr-3 text-right text-fg-muted">
+                            合计（未封顶）
+                          </td>
+                          <td className="tnum py-2 text-right font-semibold text-fg">
+                            {sc.raw.toFixed(1)}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={5} className="py-1 pr-3 text-right text-fg-muted">
+                            总分（四舍五入）
+                          </td>
+                          <td className="tnum py-1 text-right font-semibold text-brand-600">
+                            {sc.value}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+
+                  <div className="mt-3 space-y-1 text-[11px] leading-relaxed text-fg-dim">
+                    <p>
+                      达成度：满足 1.0 · 部分满足 0.5 · 待核实 0.2 · 不满足 0。
+                      权重已归一化，同一案例内合计 100。
+                    </p>
+                    {sc.hardFail ? (
+                      <p className="text-bad">存在硬性条件不满足，按门槛规则总分封顶 40。</p>
+                    ) : (
+                      <p>硬性条件全部满足，未触发封顶规则。</p>
+                    )}
+                    <p>「诊断维度」为独立评估，用于定位问题，不参与这里的合成。</p>
+                  </div>
+                </div>
+              </details>
 
               {/* 四态统计 */}
               <div className="grid grid-cols-2 border-t border-ink-700/70 sm:grid-cols-4">

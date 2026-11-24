@@ -1,6 +1,7 @@
 import { Button, Kicker, SectionHead, Shell, Tag } from '../components/ui'
 import { ArrowRight, Quote, Shield, Target, Gauge, Layers } from '../components/icons'
 import { navigate } from '../lib/router'
+import { Reveal } from '../components/Reveal'
 import { GATES, INTERVIEW_ROWS, PRINCIPLES, WEIGHTS } from '../data/demo'
 
 export function Method() {
@@ -88,15 +89,14 @@ export function Method() {
 
           <div className="grid gap-3 md:grid-cols-2">
             {PRINCIPLES.map((p, i) => (
-              <article
+              <Reveal
                 key={p.no}
-                className={`panel animate-rise rounded-xl p-5 ${
-                  i === PRINCIPLES.length - 1 ? 'md:col-span-2' : ''
-                }`}
-                style={{ animationDelay: `${i * 60}ms` }}
+                delay={i * 60}
+                className={i === PRINCIPLES.length - 1 ? 'md:col-span-2' : ''}
               >
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="font-mono text-[10px] tracking-[0.18em] text-brand-300">
+                <article className="panel h-full rounded-xl p-5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="font-mono text-[10px] tracking-[0.18em] text-brand-300">
                     {p.no}
                   </span>
                   <span className="font-mono text-[10px] text-fg-dim">来源 {p.who}</span>
@@ -109,7 +109,8 @@ export function Method() {
                     「{p.quote}」
                   </blockquote>
                 </figure>
-              </article>
+                </article>
+              </Reveal>
             ))}
           </div>
         </section>

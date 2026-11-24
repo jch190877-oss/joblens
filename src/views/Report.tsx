@@ -20,8 +20,16 @@ import {
   AlertTriangle,
 } from '../components/icons'
 import { navigate } from '../lib/router'
+import { Reveal } from '../components/Reveal'
 import { CASES, type Requirement } from '../data/demo'
 import { setCaseId, useCase, useCaseId } from '../lib/store'
+
+const FACT_STYLE: Record<string, { label: string; cls: string }> = {
+  verified: { label: '原文可证', cls: 'bg-ok/10 text-ok ring-ok/25' },
+  'needs-number': { label: '需你补数字', cls: 'bg-warn/10 text-warn ring-warn/25' },
+  blocked: { label: '已拦截新增事实', cls: 'bg-bad/10 text-bad ring-bad/25' },
+  removed: { label: '建议删除', cls: 'bg-ink-800 text-fg-dim ring-ink-600' },
+}
 
 const TYPE_META = {
   hard: { label: '硬性条件', tone: 'neutral' as const },
@@ -99,6 +107,15 @@ export function Report() {
   // 失分最严重的维度，用一句话点出来
   const weakest = useMemo(
     () => [...current.dims].sort((a, b) => a.score - b.score)[0],
+    [current],
+  )
+
+  // 挑一条最有代表性的改写做前后对照
+  const featured = useMemo(
+    () =>
+      current.rewrites.find((r) => r.fact === 'needs-number') ??
+      current.rewrites.find((r) => r.fact === 'verified') ??
+      current.rewrites[0],
     [current],
   )
 
@@ -292,6 +309,63 @@ export function Report() {
                 规则库 v0.3 · 3 道闸
               </span>
             </div>
+
+            {/* 改写前后对照 */}
+            {featured && (
+              <Reveal>
+                <section className="panel overflow-hidden rounded-xl">
+                  <header className="flex items-center justify-between border-b border-ink-700/70 bg-ink-900/40 px-5 py-3.5 sm:px-6">
+                    <div className="flex items-center gap-2.5">
+                      <Sparkle className="h-3.5 w-3.5 text-brand-400" />
+                      <h2 className="text-[13.5px] font-semibold">改写前后对照</h2>
+                      <span className="hidden text-[11.5px] text-fg-dim sm:inline">
+                        只改表达，不改事实
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/rewrite')}
+                      className="group inline-flex items-center gap-1 text-[11.5px] text-brand-300 transition-colors hover:text-brand-400"
+                    >
+                      查看全部 {current.rewrites.length} 条
+                      <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                    </button>
+                  </header>
+
+                  <div className="grid sm:grid-cols-2">
+                    <div className="border-b border-ink-700/50 p-5 sm:border-b-0 sm:border-r">
+                      <div className="mb-2 flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-widest text-fg-dim">
+                        <Doc className="h-2.5 w-2.5" />
+                        简历原话
+                      </div>
+                      <p className="text-[12.5px] leading-[1.8] text-fg-dim line-through decoration-ink-500 decoration-1">
+                        {featured.before}
+                      </p>
+                    </div>
+
+                    <div className="p-5">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-widest text-fg-dim">
+                          <Sparkle className="h-2.5 w-2.5 text-brand-400" />
+                          建议表述
+                        </div>
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ring-1 ${
+                            FACT_STYLE[featured.fact]?.cls ?? ''
+                          }`}
+                        >
+                          {FACT_STYLE[featured.fact]?.label ?? featured.fact}
+                        </span>
+                      </div>
+                      <p className="text-[12.5px] leading-[1.8] text-fg/95">{featured.after}</p>
+                      <p className="mt-3 border-t border-ink-700/60 pt-2.5 text-[11px] leading-relaxed text-fg-dim">
+                        {featured.factNote}
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              </Reveal>
+            )}
 
             {/* 逐条对照 */}
             {groups.map((g) => {

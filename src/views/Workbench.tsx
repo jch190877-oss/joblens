@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Button, Kicker, Shell, Tag } from '../components/ui'
-import { ArrowRight, CheckCircle, Doc, Sparkle, Target, Shield, ChevronRight } from '../components/icons'
+import { ArrowRight, CheckCircle, Doc, Sparkle, Target, ChevronRight } from '../components/icons'
 import { navigate } from '../lib/router'
 import { CASES } from '../data/demo'
 import { setCaseId, useCase, useCaseId } from '../lib/store'
@@ -30,13 +30,12 @@ export function Workbench() {
             用一个案例体验岗位对照
           </h1>
           <p className="mt-2.5 max-w-xl text-[13.5px] leading-relaxed text-fg-muted">
-            选择一个脱敏案例，依次查看简历、岗位描述和预设对照报告。自定义材料分析待接入。
+            挑一份脱敏案例，看看岗位要求如何对照到简历原文。
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-ink-700 bg-ink-850/60 px-3 py-2">
-          <Shield className="h-3.5 w-3.5 text-ok" />
           <span className="font-mono text-[10.5px] tracking-wide text-fg-muted">
-            本地演示 · 数据不会上传
+            预设案例
           </span>
         </div>
       </div>
@@ -93,7 +92,7 @@ export function Workbench() {
           {/* ---------- STEP 1 ---------- */}
           {step === 0 && (
             <div className="animate-fade">
-              <h2 className="text-[16px] font-semibold">选择一份演示简历</h2>
+              <h2 className="text-xl font-semibold">选择一份演示简历</h2>
               <p className="mt-1.5 text-[12.5px] text-fg-muted">
                 这 3 份简历均来自访谈中同学自述的真实经历，已匿名化。
               </p>
@@ -132,20 +131,15 @@ export function Workbench() {
                 })}
               </div>
 
-              <div className="mt-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Doc className="h-3.5 w-3.5 text-fg-dim" />
-                    <span className="text-[12.5px] font-medium text-fg-muted">简历文本</span>
-                  </div>
-                </div>
+              <details className="jl-disclosure mt-6 rounded-xl border border-ink-700 bg-ink-900/50 px-4">
+                <summary className="py-3 text-sm font-medium"><Doc className="mr-2 h-4 w-4 text-brand-300" /> 查看简历原文</summary>
                 <textarea
                   value={current.resume}
                   readOnly
                   aria-label="示例简历"
-                  className="h-[240px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/60 p-4 font-mono text-[12px] leading-[1.85] text-fg-muted"
+                  className="mb-3 h-[240px] w-full resize-y rounded-lg border border-ink-700 bg-ink-950/60 p-4 text-sm leading-relaxed text-fg-muted"
                 />
-              </div>
+              </details>
             </div>
           )}
 
@@ -154,9 +148,9 @@ export function Workbench() {
             <div className="animate-fade">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-[16px] font-semibold">查看示例岗位描述</h2>
+                  <h2 className="text-xl font-semibold">查看示例岗位描述</h2>
                   <p className="mt-1.5 text-[12.5px] text-fg-muted">
-                    下一步可查看案例中的硬性条件、核心职责与加分项。
+                    先读岗位要求，再看拆解。
                   </p>
                 </div>
                 <Tag tone="brand">{current.role}</Tag>
@@ -177,18 +171,10 @@ export function Workbench() {
                   readOnly
                   aria-label="示例岗位描述"
                   spellCheck={false}
-                  className="h-[330px] w-full resize-none rounded-xl border border-ink-700 bg-ink-950/70 p-4 font-mono text-[12px] leading-[1.9] text-fg-muted outline-none transition-colors focus:border-brand-500/50 focus:text-fg"
+                  className="h-[270px] w-full resize-y rounded-xl border border-ink-700 bg-ink-950/70 p-4 text-sm leading-relaxed text-fg-muted outline-none transition-colors focus:border-brand-500/50 focus:text-fg"
                 />
               </div>
 
-              <div className="mt-4 flex items-start gap-2 rounded-lg border border-ink-700 bg-ink-900/50 px-3.5 py-3">
-                <Sparkle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-400" />
-                <p className="text-[12px] leading-relaxed text-fg-muted">
-                  访谈里 S05 提到，很多校招推文里的 JD 写得很泛。
-                  我们会把泛泛的表述标注为「<span className="text-warn">理解待确认</span>」，
-                  而不是替你猜它的含义。
-                </p>
-              </div>
             </div>
           )}
 
@@ -197,7 +183,7 @@ export function Workbench() {
             <div className="animate-fade">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-[16px] font-semibold">拆解结果 · 请核对</h2>
+                  <h2 className="text-xl font-semibold">拆解结果 · 请核对</h2>
                   <p className="mt-1.5 text-[12.5px] text-fg-muted">
                     共识别 {current.requirements.length} 条要求。拆错的地方可以直接勾掉。
                   </p>
@@ -293,37 +279,8 @@ export function Workbench() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-ink-700 bg-ink-900/40 p-5">
-            <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
-              本轮会产出
-            </div>
-            <ul className="space-y-2 text-[12px] text-fg-muted">
-              {[
-                '逐条四态判定（满足 / 部分 / 不满足 / 待核实）',
-                '每条要求对应的简历原文依据',
-                '需要你补充的事实清单',
-                '可直接采纳的改写建议',
-              ].map((t) => (
-                <li key={t} className="flex gap-2">
-                  <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-brand-500" />
-                  <span className="leading-relaxed">{t}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-xl border border-ok/20 bg-ok/[0.05] p-4">
-            <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-ok">
-              <Shield className="h-3.5 w-3.5" />
-              事实安全承诺
-            </div>
-            <p className="mt-1.5 text-[11.5px] leading-relaxed text-fg-muted">
-              系统不会为你生成任何未经你确认的技能、职责或数字。缺口处一律留空，等你自己填。
-            </p>
-          </div>
         </aside>
       </div>
-
     </Shell>
   )
 }

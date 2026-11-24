@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Button, Kicker, Shell, Tag } from '../components/ui'
 import {
   ArrowRight,
-  Chat,
   CheckCircle,
   Doc,
   Sparkle,
@@ -104,9 +103,7 @@ export function Deepdive() {
               {deep.title}
             </h1>
             <p className="mt-2.5 text-[13.5px] leading-[1.85] text-fg-muted">
-              我们不直接改写。系统只负责把问题问准——
-              <span className="text-fg">你回答事实，它负责组织成证据。</span>
-              这个交互来自 S02 访谈：他让 AI 一直反问，直到把自己都问清楚了。
+              回答问题，证据卡会随答案更新。
             </p>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -257,14 +254,6 @@ export function Deepdive() {
 
         {/* ============ 右：追问 ============ */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2 rounded-xl border border-brand-500/20 bg-brand-500/[0.05] px-4 py-3">
-            <Chat className="h-3.5 w-3.5 shrink-0 text-brand-400" />
-            <p className="text-[12px] leading-relaxed text-fg-muted">
-              案例预设了几条追问，从「你做了什么」问到「你怎么知道它有效」。
-              可直接填写或使用示例，答案仅保留在当前页面会话。
-            </p>
-          </div>
-
           {deep.questions.map((q, i) => {
             const val = answers[q.id] ?? ''
             const isDone = val.trim().length > 0
@@ -294,17 +283,14 @@ export function Deepdive() {
                   <div className="min-w-0 flex-1">
                     <div className="mb-1.5 flex flex-wrap items-center gap-2">
                       <Tag tone={isDone ? 'ok' : 'brand'}>{q.slot}</Tag>
-                      <span className="font-mono text-[9.5px] tracking-wide text-fg-dim">
-                        对应 {deep.reqRef}
-                      </span>
                     </div>
 
-                    <p className="text-[13.5px] font-medium leading-[1.65]">{q.ask}</p>
+                    <p className="text-[15px] font-medium leading-relaxed">{q.ask}</p>
 
-                    <p className="mt-1.5 flex items-start gap-1.5 text-[11.5px] leading-relaxed text-fg-dim">
-                      <Sparkle className="mt-[3px] h-3 w-3 shrink-0 text-brand-500/60" />
-                      <span>{q.why}</span>
-                    </p>
+                    <details className="jl-disclosure mt-1">
+                      <summary className="py-1 text-xs text-brand-300">为什么问这条？</summary>
+                      <p className="text-sm leading-relaxed text-fg-muted">{q.why}</p>
+                    </details>
 
                     {/* 输入 */}
                     <div className="mt-3">

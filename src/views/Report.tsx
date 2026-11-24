@@ -6,16 +6,13 @@ import {
   ScoreDial,
   Shell,
   StatusPill,
-  Tag,
   STATUS_META,
 } from '../components/ui'
 import {
   ArrowRight,
   Chat,
   Doc,
-  Download,
   Layers,
-  Shield,
   Sparkle,
   AlertTriangle,
 } from '../components/icons'
@@ -31,66 +28,31 @@ const FACT_STYLE: Record<string, { label: string; cls: string }> = {
   removed: { label: '建议删除', cls: 'bg-ink-800 text-fg-dim ring-ink-600' },
 }
 
-const TYPE_META = {
-  hard: { label: '硬性条件', tone: 'neutral' as const },
-  core: { label: '核心职责', tone: 'brand' as const },
-  plus: { label: '加分项', tone: 'neutral' as const },
-}
-
 function ReqRow({ r }: { r: Requirement }) {
   const m = STATUS_META[r.status]
+
   return (
-    <div className="group relative border-b border-ink-700/40 px-5 py-5 transition-colors last:border-0 hover:bg-ink-800/30 sm:px-6">
-      {/* 左色条 */}
-      <span className={`absolute inset-y-0 left-0 w-[2px] ${m.bar}`} />
+    <details className="jl-disclosure group relative border-b border-ink-700/55 last:border-0">
+      <summary className="px-5 py-4 hover:bg-ink-800/40 sm:px-6">
+        <span className={`absolute inset-y-0 left-0 w-[2px] ${m.bar}`} aria-hidden="true" />
+        <span className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-3 gap-y-2 pr-3">
+          <span className="text-sm font-medium leading-relaxed sm:max-w-[75%]">{r.jdLine}</span>
+          <StatusPill status={r.status} size="sm" />
+        </span>
+      </summary>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[9.5px] tracking-[0.14em] text-fg-dim">{r.rule}</span>
-            <Tag tone={TYPE_META[r.type].tone}>{TYPE_META[r.type].label}</Tag>
-            <span className="font-mono text-[10px] text-fg-dim">权重 {r.weight}%</span>
-          </div>
-          <p className="text-[13.5px] leading-[1.7] text-fg/90">{r.jdLine}</p>
-        </div>
-        <StatusPill status={r.status} size="sm" />
-      </div>
-
-      {/* 原文依据 */}
-      <div className="mt-3.5">
-        <div
-          className={`rounded-lg border px-3.5 py-2.5 ${
-            r.evidence && !r.evidence.startsWith('（')
-              ? 'border-ink-700 bg-ink-950/50'
-              : 'border-dashed border-ink-700 bg-transparent'
-          }`}
-        >
-          <div className="mb-1 flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-widest text-fg-dim">
-            <Doc className="h-2.5 w-2.5" />
-            简历原文依据
-          </div>
-          <p
-            className={`text-[12px] leading-relaxed ${
-              r.evidence && !r.evidence.startsWith('（') ? 'text-fg-muted' : 'text-fg-dim/70'
-            }`}
-          >
-            {r.evidence ? `「${r.evidence}」` : '（未找到对应表述）'}
+      <div className="space-y-3 px-5 pb-5 sm:px-6">
+        <p className="text-xs text-fg-dim"><span className="font-mono">{r.rule}</span> · 权重 {r.weight}%</p>
+        <blockquote className="rounded-lg border-l-2 border-brand-500/45 bg-ink-950/50 px-4 py-3">
+          <span className="block text-xs font-medium text-brand-300">简历原文依据</span>
+          <p className="mt-1 text-sm leading-relaxed text-fg-muted">
+            {r.evidence ? `「${r.evidence}」` : '未找到对应表述'}
           </p>
-        </div>
+        </blockquote>
+        <p className="text-sm leading-relaxed text-fg-muted">{r.note}</p>
+        {r.gap && <p className="text-sm leading-relaxed text-warn">待你补充：{r.gap}</p>}
       </div>
-
-      <p className="mt-3 text-[12px] leading-[1.75] text-fg-muted">{r.note}</p>
-
-      {r.gap && (
-        <div className="mt-2.5 flex items-start gap-1.5 rounded-md border border-warn/20 bg-warn/[0.04] px-2.5 py-2">
-          <Sparkle className="mt-0.5 h-3 w-3 shrink-0 text-warn" />
-          <span className="text-[11.5px] leading-relaxed text-warn/90">
-            <span className="font-medium">待你补充：</span>
-            {r.gap}
-          </span>
-        </div>
-      )}
-    </div>
+    </details>
   )
 }
 
@@ -120,9 +82,9 @@ export function Report() {
   )
 
   const groups = [
-    { key: 'hard', label: '硬性条件', hint: '不满足则直接出局' },
-    { key: 'core', label: '核心职责', hint: '决定竞争力上限' },
-    { key: 'plus', label: '加分项', hint: '同等条件下拉开差距' },
+    { key: 'hard', label: '硬性条件' },
+    { key: 'core', label: '核心职责' },
+    { key: 'plus', label: '加分项' },
   ] as const
 
   return (
@@ -143,7 +105,7 @@ export function Report() {
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
               <Kicker className="mb-3">岗位对照报告</Kicker>
-              <h1 className="text-[26px] font-semibold leading-tight sm:text-[32px]">
+              <h1 className="text-[28px] font-semibold leading-tight sm:text-[38px]">
                 {current.role}
               </h1>
               <p className="mt-2 text-[13px] text-fg-muted">
@@ -152,9 +114,6 @@ export function Report() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="outline" size="sm" icon={<Download className="h-3.5 w-3.5" />}>
-                导出报告
-              </Button>
               <Button
                 size="sm"
                 onClick={() => navigate('/deepdive')}
@@ -185,7 +144,17 @@ export function Report() {
           </div>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1fr_306px]">
+        <div className="mb-6 rounded-xl border border-brand-500/30 bg-brand-500/[0.09] px-5 py-4 sm:px-6">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-xs font-semibold text-brand-300">优先补充</span>
+            <span className="text-base font-semibold">{current.priority[0]?.title ?? weakest.label}</span>
+          </div>
+          {current.priority[0] && (
+            <p className="mt-1 text-sm leading-relaxed text-fg-muted">{current.priority[0].detail}</p>
+          )}
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_290px]">
           {/* ============ 主栏 ============ */}
           <div className="space-y-5">
             {/* 概览 */}
@@ -221,11 +190,16 @@ export function Report() {
                         key={d.key}
                         label={d.label}
                         value={d.score}
-                        hint={d.basis}
                         delay={i * 90}
                       />
                     ))}
                   </div>
+                  <details className="jl-disclosure mt-3 border-t border-ink-700/60">
+                    <summary className="py-2 text-sm text-brand-300">查看评分依据</summary>
+                    <ul className="space-y-2 pb-2 text-sm text-fg-muted">
+                      {current.dims.map((d) => <li key={d.key}><strong className="text-fg">{d.label}</strong> · {d.basis}</li>)}
+                    </ul>
+                  </details>
                 </div>
               </div>
 
@@ -290,26 +264,6 @@ export function Report() {
               </div>
             </section>
 
-            {/* 事实校验摘要 */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-ink-700 bg-ink-900/40 px-5 py-3.5">
-              <span className="flex items-center gap-1.5 text-[12px] font-medium text-fg">
-                <Shield className="h-3.5 w-3.5 text-ok" />
-                事实校验
-              </span>
-              <span className="text-[11.5px] text-fg-muted">
-                原文可证 <span className="tnum text-ok">{stats.met + stats.partial}</span> 条
-              </span>
-              <span className="text-[11.5px] text-fg-muted">
-                待补充 <span className="tnum text-warn">{stats.missing + stats.unverified}</span> 项
-              </span>
-              <span className="text-[11.5px] text-fg-muted">
-                已拦截 <span className="tnum text-bad">1</span> 处 AI 新增事实
-              </span>
-              <span className="ml-auto font-mono text-[10px] text-fg-dim">
-                规则库 v0.3 · 3 道闸
-              </span>
-            </div>
-
             {/* 改写前后对照 */}
             {featured && (
               <Reveal>
@@ -318,9 +272,6 @@ export function Report() {
                     <div className="flex items-center gap-2.5">
                       <Sparkle className="h-3.5 w-3.5 text-brand-400" />
                       <h2 className="text-[13.5px] font-semibold">改写前后对照</h2>
-                      <span className="hidden text-[11.5px] text-fg-dim sm:inline">
-                        只改表达，不改事实
-                      </span>
                     </div>
                     <button
                       type="button"
@@ -338,7 +289,7 @@ export function Report() {
                         <Doc className="h-2.5 w-2.5" />
                         简历原话
                       </div>
-                      <p className="text-[12.5px] leading-[1.8] text-fg-dim line-through decoration-ink-500 decoration-1">
+                      <p className="text-sm leading-relaxed text-fg-muted">
                         {featured.before}
                       </p>
                     </div>
@@ -357,7 +308,7 @@ export function Report() {
                           {FACT_STYLE[featured.fact]?.label ?? featured.fact}
                         </span>
                       </div>
-                      <p className="text-[12.5px] leading-[1.8] text-fg/95">{featured.after}</p>
+                      <p className="text-sm leading-relaxed text-fg/95">{featured.after}</p>
                       <p className="mt-3 border-t border-ink-700/60 pt-2.5 text-[11px] leading-relaxed text-fg-dim">
                         {featured.factNote}
                       </p>
@@ -367,7 +318,10 @@ export function Report() {
               </Reveal>
             )}
 
-            {/* 逐条对照 */}
+            <header className="pt-3">
+              <h2 className="text-xl font-semibold">岗位要求逐条对照</h2>
+              <p className="mt-1 text-sm text-fg-muted">点开任意要求，核对原文与判定理由。</p>
+            </header>
             {groups.map((g) => {
               const list = current.requirements.filter((r) => r.type === g.key)
               if (!list.length) return null
@@ -377,7 +331,6 @@ export function Report() {
                     <div className="flex items-center gap-2.5">
                       <Layers className="h-3.5 w-3.5 text-fg-dim" />
                       <h2 className="text-[13.5px] font-semibold">{g.label}</h2>
-                      <span className="text-[11.5px] text-fg-dim">{g.hint}</span>
                     </div>
                     <span className="tnum font-mono text-[11px] text-fg-dim">{list.length}</span>
                   </header>
@@ -390,27 +343,6 @@ export function Report() {
               )
             })}
 
-            {/* 底部 CTA */}
-            <div className="panel relative overflow-hidden rounded-xl p-6">
-              <div className="glow-brand pointer-events-none absolute inset-0 opacity-40" />
-              <div className="relative flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                <div>
-                  <div className="flex items-center gap-2 text-[14px] font-semibold">
-                    <Sparkle className="h-4 w-4 text-brand-400" />
-                    有 {stats.missing + stats.unverified} 条要求缺少原文依据
-                  </div>
-                  <p className="mt-1.5 text-[12.5px] text-fg-muted">
-                    先补齐事实，再谈改写——这是访谈里所有人都在做的事，只是他们靠自己硬撑。
-                  </p>
-                </div>
-                <Button
-                  onClick={() => navigate('/deepdive')}
-                  icon={<ArrowRight className="h-3.5 w-3.5" />}
-                >
-                  进入反问深挖
-                </Button>
-              </div>
-            </div>
           </div>
 
           {/* ============ 右栏 ============ */}
@@ -418,7 +350,7 @@ export function Report() {
             <div className="panel rounded-xl p-5">
               <div className="mb-3 flex items-center justify-between">
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
-                  必须补的信息
+                  补充清单
                 </span>
                 <span className="rounded bg-warn/15 px-1.5 py-0.5 font-mono text-[9.5px] text-warn">
                   {current.priority.length}
@@ -447,46 +379,17 @@ export function Report() {
               </Button>
             </div>
 
-            <div className="rounded-xl border border-ink-700 bg-ink-900/40 p-5">
-              <div className="mb-3 flex items-center gap-2">
-                <AlertTriangle className="h-3.5 w-3.5 text-warn" />
-                <span className="text-[12px] font-medium">HR 首屏扫描</span>
-              </div>
-              <ul className="space-y-2.5">
-                {current.hrFold.map((h, i) => (
-                  <li key={i} className="flex gap-2 text-[11.5px] leading-relaxed text-fg-dim">
-                    <span className="mt-[6px] h-1 w-1 shrink-0 rounded-full bg-ink-500" />
-                    <span>{h}</span>
-                  </li>
-                ))}
+            <details className="jl-disclosure rounded-xl border border-ink-700 bg-ink-900/40 px-5">
+              <summary className="py-4 text-sm font-medium">
+                <AlertTriangle className="mr-2 h-3.5 w-3.5 text-warn" /> HR 首屏扫描
+              </summary>
+              <ul className="space-y-2 pb-4">
+                {current.hrFold.map((h) => <li key={h} className="text-sm leading-relaxed text-fg-muted">{h}</li>)}
               </ul>
-            </div>
-
-            <div className="rounded-xl border border-ink-700 bg-ink-900/40 p-5">
-              <div className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
-                下一步
-              </div>
-              <div className="space-y-1.5">
-                {[
-                  { label: '反问式深挖', to: '/deepdive', active: true },
-                  { label: '改写工作台', to: '/rewrite', active: false },
-                  { label: '回到工作台', to: '/app', active: false },
-                ].map((n) => (
-                  <button
-                    key={n.to}
-                    type="button"
-                    onClick={() => navigate(n.to)}
-                    className="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-[12.5px] text-fg-muted transition-colors hover:bg-ink-800 hover:text-fg"
-                  >
-                    {n.label}
-                    <ArrowRight className="h-3 w-3 opacity-40" />
-                  </button>
-                ))}
-              </div>
-            </div>
+            </details>
 
             <p className="px-1 text-[10.5px] leading-relaxed text-fg-dim">
-              报告结论为求职辅助建议，每条判定均指向简历原文。录用判断由招聘主体独立完成。
+              示例评分用于定位缺口。
             </p>
           </aside>
         </div>

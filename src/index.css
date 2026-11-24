@@ -107,7 +107,7 @@
 
 .hero-title {
   font-family: 'JobLens Display', 'Songti SC', 'Noto Serif CJK SC', SimSun, serif;
-  font-size: clamp(1.75rem, 8.2vw, 3.5rem);
+  font-size: clamp(2.25rem, 9.1vw, 4.4rem);
   font-weight: 600;
   line-height: 1.23;
   letter-spacing: 0.005em;
@@ -115,11 +115,62 @@
 
 .hero-title-accent {
   display: block;
+  margin-top: 0.1em;
 }
 
 @media (min-width: 64rem) {
   .hero-title {
-    font-size: clamp(2.625rem, 4.2vw, 3.5rem);
+    font-size: clamp(3.25rem, 5vw, 4.75rem);
+  }
+}
+
+.hero-demo-step {
+  animation: jl-rise 0.55s cubic-bezier(0.22, 0.72, 0.2, 1) both;
+}
+
+.hero-demo-step:nth-child(2) {
+  animation-delay: 130ms;
+}
+
+.hero-demo-question {
+  animation-delay: 260ms;
+}
+
+.jl-disclosure > summary {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  list-style: none;
+}
+
+.jl-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.jl-disclosure > summary::after {
+  content: '';
+  inline-size: 0.46rem;
+  block-size: 0.46rem;
+  flex: none;
+  margin-inline-start: auto;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-0.13rem) rotate(45deg);
+  opacity: 0.72;
+}
+
+.jl-disclosure[open] > summary::after {
+  transform: translateY(0.13rem) rotate(225deg);
+}
+
+.jl-disclosure > summary:focus-visible {
+  outline: 2px solid var(--color-brand-400);
+  outline-offset: -3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-demo-step {
+    animation: none;
   }
 }
 

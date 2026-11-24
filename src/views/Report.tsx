@@ -22,6 +22,7 @@ import {
 import { navigate } from '../lib/router'
 import { Reveal } from '../components/Reveal'
 import { CASES, type Requirement } from '../data/demo'
+import { HR_BY_CASE, VERDICT_META, CHECK_META } from '../data/hr'
 import { setCaseId, useCase, useCaseId } from '../lib/store'
 
 const FACT_STYLE: Record<string, { label: string; cls: string }> = {
@@ -118,6 +119,11 @@ export function Report() {
       current.rewrites[0],
     [current],
   )
+
+  // HR 访谈衍生：经历结构 / 平台检查 / 投递前自检
+  const hr = HR_BY_CASE[current.id]
+  const mixMax = Math.max(1, ...(hr ? hr.expMix.map((m) => m.count * m.weight) : [1]))
+  const checkPass = hr ? hr.checks.filter((c) => c.status === 'pass').length : 0
 
   const groups = [
     { key: 'hard', label: '硬性条件', hint: '不满足则直接出局' },
@@ -310,6 +316,106 @@ export function Report() {
               </span>
             </div>
 
+            {/* 经历结构（HR 口径） */}
+            {hr && (
+              <Reveal>
+                <section className="panel overflow-hidden rounded-xl">
+                  <header className="flex items-center justify-between border-b border-ink-700/70 bg-ink-900/40 px-5 py-3.5 sm:px-6">
+                    <div className="flex items-center gap-2.5">
+                      <Layers className="h-3.5 w-3.5 text-fg-dim" />
+                      <h2 className="text-[13.5px] font-semibold">经历结构</h2>
+                      <span className="hidden text-[11.5px] text-fg-dim sm:inline">
+                        按 HR 口径加权，不只看数量
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-fg-dim">HR01 · HR02</span>
+                  </header>
+
+                  <div className="space-y-2.5 p-5">
+                    {hr.expMix.map((m) => {
+                      const weighted = m.count * m.weight
+                      return (
+                        <div key={m.kind} className="flex items-center gap-3">
+                          <span className="w-[68px] shrink-0 text-[12px] text-fg-muted">
+                            {m.label}
+                          </span>
+                          <div className="relative h-[7px] flex-1 overflow-hidden rounded-full bg-ink-800">
+                            <div
+                              className={`h-full rounded-full ${m.count ? 'bg-brand-500' : ''}`}
+                              style={{ width: `${(weighted / mixMax) * 100}%` }}
+                            />
+                          </div>
+                          <span className="tnum w-11 shrink-0 text-right text-[11.5px] text-fg-muted">
+                            {m.count} 段
+                          </span>
+                          <span className="w-9 shrink-0 text-right font-mono text-[10px] text-fg-dim">
+                            ×{m.weight}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div className="border-t border-ink-700/60 px-5 py-4">
+                    <p className="text-[12px] leading-[1.75] text-fg-muted">{hr.verdict}</p>
+                    <p className="mt-2.5 text-[11px] leading-relaxed text-fg-dim">
+                      权重口径：实习 1.0 / 项目 0.8 / 竞赛 0.6 / 校园活动 0.4（HR01 的经历排序）。
+                      另一位 HR 认为「经历类型只是不同维度、没有高低之分」——所以这是一套可调权重，不是唯一标准。
+                    </p>
+                  </div>
+                </section>
+              </Reveal>
+            )}
+
+            {/* 平台还是你的 */}
+            {hr && (
+              <Reveal>
+                <section className="panel overflow-hidden rounded-xl">
+                  <header className="flex items-center justify-between border-b border-ink-700/70 bg-ink-900/40 px-5 py-3.5 sm:px-6">
+                    <div className="flex items-center gap-2.5">
+                      <Shield className="h-3.5 w-3.5 text-fg-dim" />
+                      <h2 className="text-[13.5px] font-semibold">平台还是你的</h2>
+                      <span className="hidden text-[11.5px] text-fg-dim sm:inline">
+                        离开这个平台，这句话还成立吗
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-fg-dim">HR02</span>
+                  </header>
+
+                  <div className="divide-y divide-ink-700/50">
+                    {hr.platform.map((p) => {
+                      const vm = VERDICT_META[p.verdict]
+                      return (
+                        <div key={p.id} className="px-5 py-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <p className="min-w-0 flex-1 text-[12.5px] leading-[1.7] text-fg">
+                              「{p.claim}」
+                            </p>
+                            <span
+                              className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] ring-1 ${vm.cls}`}
+                            >
+                              {vm.label}
+                            </span>
+                          </div>
+                          <p className="mt-2 flex items-start gap-1.5 text-[11.5px] leading-relaxed text-brand-600">
+                            <Chat className="mt-[2px] h-3 w-3 shrink-0" />
+                            <span>{p.ask}</span>
+                          </p>
+                          <p className="mt-1.5 text-[11.5px] leading-relaxed text-fg-dim">{p.note}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div className="border-t border-ink-700/60 px-5 py-3">
+                    <p className="text-[11px] leading-relaxed text-fg-dim">
+                      HR02 原话：「知名企业实习最大的坑，就是把平台当成个人能力。对我来说，没有什么区别。」
+                    </p>
+                  </div>
+                </section>
+              </Reveal>
+            )}
+
             {/* 改写前后对照 */}
             {featured && (
               <Reveal>
@@ -389,6 +495,52 @@ export function Report() {
                 </section>
               )
             })}
+
+            {/* 投递前自检 */}
+            {hr && (
+              <Reveal>
+                <section className="panel overflow-hidden rounded-xl">
+                  <header className="flex items-center justify-between border-b border-ink-700/70 bg-ink-900/40 px-5 py-3.5 sm:px-6">
+                    <div className="flex items-center gap-2.5">
+                      <AlertTriangle className="h-3.5 w-3.5 text-fg-dim" />
+                      <h2 className="text-[13.5px] font-semibold">投递前自检</h2>
+                      <span className="hidden text-[11.5px] text-fg-dim sm:inline">
+                        和文笔无关，但会直接导致淘汰
+                      </span>
+                    </div>
+                    <span className="tnum font-mono text-[10px] text-fg-dim">
+                      {checkPass}/{hr.checks.length} 通过
+                    </span>
+                  </header>
+
+                  <div className="divide-y divide-ink-700/50">
+                    {hr.checks.map((c) => {
+                      const cm = CHECK_META[c.status]
+                      return (
+                        <div key={c.id} className="flex items-start gap-3 px-5 py-3.5">
+                          <span className={`mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full ${cm.dot}`} />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[12.5px] font-medium">{c.label}</span>
+                              <span className={`font-mono text-[10px] ${cm.cls}`}>{cm.label}</span>
+                            </div>
+                            <p className="mt-0.5 text-[11.5px] leading-relaxed text-fg-dim">
+                              {c.detail}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div className="border-t border-ink-700/60 px-5 py-3">
+                    <p className="text-[11px] leading-relaxed text-fg-dim">
+                      HR02 原话：「最影响的是不写联系方式，或者联系方式无效。」这类问题和技术无关，但会在初筛阶段直接出局。
+                    </p>
+                  </div>
+                </section>
+              </Reveal>
+            )}
 
             {/* 底部 CTA */}
             <div className="panel relative overflow-hidden rounded-xl p-6">

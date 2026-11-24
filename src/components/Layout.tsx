@@ -133,6 +133,8 @@ export function Page({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
+      {/* 全站细噪点：固定层，不参与布局与交互 */}
+      <div className="grain" aria-hidden />
       <NavBar route={route} />
       <main className="flex-1">{children}</main>
       {!bare && <Footer />}

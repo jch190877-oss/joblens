@@ -96,6 +96,12 @@ export function Report() {
     return s
   }, [current])
 
+  // 失分最严重的维度，用一句话点出来
+  const weakest = useMemo(
+    () => [...current.dims].sort((a, b) => a.score - b.score)[0],
+    [current],
+  )
+
   const groups = [
     { key: 'hard', label: '硬性条件', hint: '不满足则直接出局' },
     { key: 'core', label: '核心职责', hint: '决定竞争力上限' },
@@ -167,18 +173,32 @@ export function Report() {
           <div className="space-y-5">
             {/* 概览 */}
             <section className="panel overflow-hidden rounded-xl">
-              <div className="grid gap-6 p-6 sm:grid-cols-[auto_1fr] sm:gap-8">
-                <div className="flex justify-center sm:justify-start">
+              <div className="grid gap-7 p-6 sm:grid-cols-[188px_1fr] sm:gap-9">
+                {/* 左：分数 + 一句话结论 */}
+                <div className="flex flex-col items-center gap-4 sm:items-start">
                   <ScoreDial value={current.score} sub={current.code} />
+                  <div className="w-full rounded-lg border border-ink-700/70 bg-ink-950/40 px-3 py-2.5">
+                    <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-fg-dim">
+                      主要失分
+                    </div>
+                    <div className="mt-1 flex items-baseline justify-between gap-2">
+                      <span className="text-[12.5px] font-medium text-warn">{weakest.label}</span>
+                      <span className="tnum font-mono text-[12.5px] text-warn/80">
+                        {weakest.score}
+                      </span>
+                    </div>
+                  </div>
                 </div>
+
+                {/* 右：五维 */}
                 <div className="min-w-0">
-                  <div className="mb-4 flex items-center justify-between">
+                  <div className="mb-3.5 flex items-center justify-between">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
                       五维评分
                     </span>
                     <span className="font-mono text-[10px] text-fg-dim">权重见方法论</span>
                   </div>
-                  <div className="space-y-3.5">
+                  <div className="space-y-3">
                     {current.dims.map((d, i) => (
                       <Meter
                         key={d.key}
@@ -189,6 +209,36 @@ export function Report() {
                       />
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* 满足度分布条 */}
+              <div className="border-t border-ink-700/70 px-6 py-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-fg-dim">
+                    要求满足分布
+                  </span>
+                  <span className="tnum font-mono text-[10px] text-fg-dim">
+                    {current.requirements.length} 条
+                  </span>
+                </div>
+                <div className="flex h-[6px] gap-px overflow-hidden rounded-full bg-ink-800">
+                  {(
+                    [
+                      ['met', stats.met],
+                      ['partial', stats.partial],
+                      ['missing', stats.missing],
+                      ['unverified', stats.unverified],
+                    ] as const
+                  )
+                    .filter(([, n]) => n > 0)
+                    .map(([k, n]) => (
+                      <div
+                        key={k}
+                        className={`h-full ${STATUS_META[k].bar} opacity-80`}
+                        style={{ width: `${(n / current.requirements.length) * 100}%` }}
+                      />
+                    ))}
                 </div>
               </div>
 

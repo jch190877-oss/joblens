@@ -41,8 +41,12 @@ export function NavBar({ route }: { route: string }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <span className="hidden items-center gap-1.5 rounded-full border border-ink-600 px-2.5 py-1 font-mono text-[10.5px] tracking-wide text-fg-dim md:inline-flex">
+            <span className="h-1.5 w-1.5 animate-blink rounded-full bg-ok" />
+            DEMO
+          </span>
           <Button size="sm" onClick={() => navigate('/app')} icon={<ArrowRight className="h-3.5 w-3.5" />}>
-            体验示例
+            开始分析
           </Button>
         </div>
       </Shell>
@@ -61,7 +65,8 @@ export function Footer() {
               <span className="text-[14.5px] font-semibold">职镜 JobLens</span>
             </div>
             <p className="mt-3 text-[13px] leading-relaxed text-fg-muted">
-              大学生求职简历对照工具。
+              面向大学生求职场景的 AI 简历竞争力分析与优化平台。
+              不替你编经历，只帮你把真实做过的事，讲成值得录用的证据。
             </p>
           </div>
 
@@ -92,6 +97,8 @@ export function Footer() {
               >
                 访谈方法论
               </button>
+              <span className="block py-1 text-[13px] text-fg-dim">评分口径</span>
+              <span className="block py-1 text-[13px] text-fg-dim">事实安全边界</span>
             </div>
             <div>
               <div className="mb-2.5 font-mono text-[10.5px] uppercase tracking-[0.16em] text-fg-dim">

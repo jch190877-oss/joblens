@@ -95,11 +95,13 @@ export function Rewrite() {
         <Kicker className="mb-3">改写工作台</Kicker>
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
           <div className="max-w-2xl">
-            <h1 className="text-[28px] font-semibold leading-tight sm:text-[38px]">
-              对照原文，选择建议
+            <h1 className="text-[26px] font-semibold leading-tight sm:text-[32px]">
+              采纳之前，先看清它凭什么这么说
             </h1>
             <p className="mt-2.5 text-[13.5px] leading-[1.85] text-fg-muted">
-              先看原文与建议的差别，再决定哪些内容进入投递版。
+              每一条建议都附上原文依据、修改理由和事实状态。
+              采纳与忽略都由你决定——这一点来自 S03 的原话：
+              <span className="text-fg">「哪些采纳他的，哪些按我自己的想法来。」</span>
             </p>
           </div>
 
@@ -112,7 +114,7 @@ export function Rewrite() {
                   !hrMode ? 'bg-ink-700 text-fg' : 'text-fg-dim hover:text-fg-muted'
                 }`}
               >
-                原文对照
+                完整视图
               </button>
               <button
                 type="button"
@@ -169,7 +171,7 @@ export function Rewrite() {
         <div className="animate-rise mb-5 rounded-xl border border-brand-500/25 bg-brand-500/[0.06] px-5 py-4">
           <div className="mb-2 flex items-center gap-2 text-[12.5px] font-medium text-brand-300">
             <Eye className="h-3.5 w-3.5" />
-            HR 视角重点看动作、规模、结果
+            HR 视角：只看「动作 + 规模 + 结果」，理由和依据在这一层是不可见的
           </div>
           <ul className="grid gap-1.5 sm:grid-cols-2">
             {current.hrFold.map((h, i) => (
@@ -182,7 +184,7 @@ export function Rewrite() {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_270px]">
+      <div className="grid gap-5 lg:grid-cols-[1fr_290px]">
         {/* 主栏 */}
         <div className="space-y-3">
           {evidence && (
@@ -260,7 +262,7 @@ export function Rewrite() {
                       <Doc className="h-2.5 w-2.5" />
                       简历原文
                     </div>
-                    <p className="text-sm leading-relaxed text-fg-muted">
+                    <p className="text-[12.5px] leading-[1.75] text-fg-dim line-through decoration-ink-500 decoration-1">
                       {r.before}
                     </p>
                   </div>
@@ -272,7 +274,7 @@ export function Rewrite() {
                       建议表述
                     </div>
                     <p
-                      className={`text-sm leading-relaxed ${
+                      className={`text-[12.5px] leading-[1.75] ${
                         isRemove ? 'text-fg-dim' : 'text-fg/95'
                       }`}
                     >
@@ -282,27 +284,24 @@ export function Rewrite() {
                 </div>
 
                 {!hrMode && (
-                  <details className="jl-disclosure border-t border-ink-700/60 bg-ink-900/30 px-5">
-                    <summary className="py-3 text-sm text-brand-300">查看改写依据</summary>
-                    <div className="space-y-2.5 pb-4">
-                      <div className="flex items-start gap-2">
-                        <span className="mt-[3px] font-mono text-[9.5px] uppercase tracking-widest text-fg-dim">
-                          理由
-                        </span>
-                        <p className="flex-1 text-[11.5px] leading-relaxed text-fg-muted">
-                          {r.reason}
-                        </p>
-                      </div>
-                      <div
-                        className={`flex items-start gap-2 rounded-md px-2.5 py-2 ${fm.tone}`}
-                      >
-                        <Shield className={`mt-[2px] h-3 w-3 shrink-0 ${fm.text}`} />
-                        <p className={`flex-1 text-[11.5px] leading-relaxed ${fm.text} opacity-90`}>
-                          {r.factNote}
-                        </p>
-                      </div>
+                  <div className="space-y-2.5 border-t border-ink-700/60 bg-ink-900/30 px-5 py-4">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-[3px] font-mono text-[9.5px] uppercase tracking-widest text-fg-dim">
+                        理由
+                      </span>
+                      <p className="flex-1 text-[11.5px] leading-relaxed text-fg-muted">
+                        {r.reason}
+                      </p>
                     </div>
-                  </details>
+                    <div
+                      className={`flex items-start gap-2 rounded-md px-2.5 py-2 ${fm.tone}`}
+                    >
+                      <Shield className={`mt-[2px] h-3 w-3 shrink-0 ${fm.text}`} />
+                      <p className={`flex-1 text-[11.5px] leading-relaxed ${fm.text} opacity-90`}>
+                        {r.factNote}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             )
@@ -310,7 +309,7 @@ export function Rewrite() {
 
           <div className="flex flex-col items-start justify-between gap-3 rounded-xl border border-ink-700 bg-ink-900/40 px-5 py-4 sm:flex-row sm:items-center">
             <p className="text-[12px] text-fg-muted">
-              核对已采纳的内容，再打开投递版。
+              改完只是「可投」。要不要为下一个岗位再出一版，可以随时从这里复制。
             </p>
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate('/report')}>
@@ -330,9 +329,12 @@ export function Rewrite() {
 
         {/* 右栏 */}
         <aside className="space-y-4 lg:sticky lg:top-[88px] lg:self-start">
-          <details className="jl-disclosure panel rounded-xl px-5">
-            <summary className="py-4 text-sm font-medium"><Shield className="mr-2 h-4 w-4 text-ok" /> 事实安全三道闸</summary>
-            <ul className="space-y-3 pb-5">
+          <div className="panel rounded-xl p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <Shield className="h-3.5 w-3.5 text-ok" />
+              <span className="text-[12px] font-medium">事实安全三道闸</span>
+            </div>
+            <ul className="space-y-3">
               {[
                 { n: 'G1', t: '原文锚定', d: '指不回原文的内容不进入改写稿' },
                 { n: 'G2', t: '数字留空', d: '模型不生成任何量化数字' },
@@ -347,7 +349,7 @@ export function Rewrite() {
                 </li>
               ))}
             </ul>
-          </details>
+          </div>
 
           <div className="rounded-xl border border-ink-700 bg-ink-900/40 p-5">
             <div className="mb-2 flex items-center gap-2">
@@ -355,7 +357,8 @@ export function Rewrite() {
               <span className="text-[11.5px] font-medium text-fg-muted">导出前提醒</span>
             </div>
             <p className="text-[11px] leading-relaxed text-fg-dim">
-              请核对导出内容里的数字和经历。
+              导出前请逐条确认：这里的数字都是真实发生过的吗？
+              系统无法替你验证，也不会替你承担后果。
             </p>
           </div>
 
@@ -364,7 +367,7 @@ export function Rewrite() {
               换一个岗位
             </div>
             <p className="text-[11px] leading-relaxed text-fg-dim">
-              回到工作台选择其他岗位案例。
+              S01 提到，一份经历可以有很多种描述方式。同一段经历换岗只需要重排，不用重写。
             </p>
             <Button
               variant="outline"
@@ -372,7 +375,7 @@ export function Rewrite() {
               className="mt-3 w-full"
               onClick={() => navigate('/app')}
             >
-              选择其他案例
+              新建一个岗位版本
             </Button>
           </div>
         </aside>

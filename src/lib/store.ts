@@ -27,19 +27,22 @@ export function saveCaseAnswers(id: string, answers: Record<string, string>) {
   caseAnswers.set(id, answers)
 }
 
-export function getCompletedEvidence(current: Case) {
-  const answers = getCaseAnswers(current.id)
-  if (!answers || !current.deep.questions.every((question) => answers[question.id]?.trim())) {
-    return null
-  }
-
-  const facts = new Map(current.deep.questions.map((question) => [
-    question.token,
-    answers[question.id].trim(),
-  ]))
-  return current.deep.template.replace(/\{([^}]+)\}/g, (placeholder, token: string) =>
-    facts.get(token) ?? placeholder,
-  )
+export function getEvidenceDraft(current: Case) {
+  const answers = getCaseAnswers(current.id) ?? {}
+  const facts = current.deep.questions.flatMap((question) => {
+    const text = answers[question.id]?.trim()
+    return text ? [{ token: question.token, label: question.slot, text }] : []
+  })
+  if (!facts.length) return null
+  const pending = current.deep.questions
+    .filter((question) => !answers[question.id]?.trim())
+    .map((question) => question.slot)
+  const byToken = new Map(facts.map((fact) => [fact.token, fact.text]))
+  // Use the full sentence only when every slot is backed by an answer.
+  const text = pending.length
+    ? `${current.deep.raw}\n补充事实：${facts.map((fact) => `${fact.label}：${fact.text}`).join('；')}`
+    : current.deep.template.replace(/\{([^}]+)\}/g, (_, token: string) => byToken.get(token) ?? '')
+  return { text, pending }
 }
 
 export function setCaseId(id: string) {

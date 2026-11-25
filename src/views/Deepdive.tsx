@@ -43,6 +43,7 @@ export function Deepdive() {
     saveCaseAnswers(current.id, answers)
     navigate('/rewrite')
   }
+  const [skipped, setSkipped] = useState<string[]>([])
   const [focused, setFocused] = useState<string | null>(null)
 
   const total = deep.questions.length
@@ -51,9 +52,11 @@ export function Deepdive() {
     [answers, deep.questions],
   )
   const done = filled === total
+  const canContinue = filled > 0
   const pct = Math.round((filled / total) * 100)
 
   function set(id: string, v: string) {
+    setSkipped((items) => items.filter((item) => item !== id))
     updateAnswers({ ...answers, [id]: v })
   }
 
@@ -62,6 +65,7 @@ export function Deepdive() {
     deep.questions.forEach((q) => {
       if (!(next[q.id] ?? '').trim()) next[q.id] = q.chips[0]
     })
+    setSkipped([])
     updateAnswers(next)
   }
 
@@ -115,8 +119,8 @@ export function Deepdive() {
             </Button>
             <Button
               size="sm"
-              variant={done ? 'primary' : 'soft'}
-              disabled={!done}
+              variant={canContinue ? 'primary' : 'soft'}
+              disabled={!canContinue}
               onClick={reviewEvidence}
               icon={<ArrowRight className="h-3.5 w-3.5" />}
             >
@@ -135,6 +139,7 @@ export function Deepdive() {
                 setCaseId(c.id)
                 setAnswers(initialAnswers(c))
                 setFocused(null)
+                setSkipped([])
               }}
               className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11.5px] transition-all ${
                 c.id === currentId
@@ -321,6 +326,13 @@ export function Deepdive() {
                         }`}
                       />
                       <div className="mt-2 flex flex-wrap gap-1.5">
+                        <button type="button" className="rounded-md border border-ink-700 px-2 py-1 text-xs text-brand-400"
+                          aria-pressed={skipped.includes(q.id)} onClick={() => {
+                            set(q.id, '')
+                            setSkipped((items) => [...items, q.id])
+                          }}>
+                          {skipped.includes(q.id) ? '已标为待核对' : '记不清，暂不填写'}
+                        </button>
                         {q.chips.map((c) => (
                           <button
                             key={c}
@@ -347,8 +359,8 @@ export function Deepdive() {
           <div className="flex flex-col items-start justify-between gap-3 rounded-xl border border-ink-700 bg-ink-900/40 px-5 py-4 sm:flex-row sm:items-center">
             <p className="text-[12px] text-fg-muted">
               {done
-                ? '全部回答完毕。这条经历现在可以被安全地写进简历了。'
-                : `还剩 ${total - filled} 个问题。填不出的可以直接留空——系统不会替你编。`}
+                ? '全部填写完毕，请在改写工作台核对事实。'
+                : `还剩 ${total - filled} 个问题。至少填一项即可继续；剩下的会标为待核对。`}
             </p>
             <div className="flex gap-2">
               {!done && (
@@ -358,7 +370,7 @@ export function Deepdive() {
               )}
               <Button
                 size="sm"
-                disabled={!done}
+                disabled={!canContinue}
                 onClick={() => navigate('/rewrite')}
                 icon={<ArrowRight className="h-3.5 w-3.5" />}
               >

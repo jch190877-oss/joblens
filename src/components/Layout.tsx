@@ -46,7 +46,7 @@ export function NavBar({ route }: { route: string }) {
             DEMO
           </span>
           <Button size="sm" onClick={() => navigate('/app')} icon={<ArrowRight className="h-3.5 w-3.5" />}>
-            开始分析
+            体验案例
           </Button>
         </div>
       </Shell>
@@ -105,7 +105,7 @@ export function Footer() {
                 说明
               </div>
               <span className="block py-1 text-[13px] text-fg-dim">项目阶段：原型 Demo</span>
-              <span className="block py-1 text-[13px] text-fg-dim">数据：5 份访谈（匿名）</span>
+              <span className="block py-1 text-[13px] text-fg-dim">研究：5 位学生与 2 位招聘者（匿名）</span>
             </div>
           </div>
         </div>

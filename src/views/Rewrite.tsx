@@ -15,7 +15,7 @@ import {
 } from '../components/icons'
 import { navigate } from '../lib/router'
 import { CASES, type FactFlag } from '../data/demo'
-import { getCompletedEvidence, setCaseId, useCase, useCaseId } from '../lib/store'
+import { getEvidenceDraft, setCaseId, useCase, useCaseId } from '../lib/store'
 
 const FACT_META: Record<FactFlag, { label: string; tone: string; text: string; ring: string }> = {
   verified: {
@@ -66,9 +66,9 @@ export function Rewrite() {
 
   const exportable = current.rewrites.filter((r) => accepted[r.id] && r.fact === 'verified')
   const acceptCount = exportable.length
-  const evidence = getCompletedEvidence(current)
+  const evidence = getEvidenceDraft(current)
   const lines = exportable.map((r) => `· ${r.after}`)
-  if (confirmedEvidence && evidence) lines.push(`· ${evidence}`)
+  if (confirmedEvidence && evidence) lines.push(`· ${evidence.text}`)
   const compiled = `【改写后 · ${current.role}】\n\n${lines.join('\n') || '暂无可导出的条目'}`
 
   function toggle(id: string) {
@@ -128,7 +128,7 @@ export function Rewrite() {
               </button>
             </div>
             <Button size="sm" onClick={() => setShowExport(true)} icon={<Download className="h-3.5 w-3.5" />}>
-              导出投递版
+              预览投递文本
             </Button>
           </div>
         </div>
@@ -193,7 +193,8 @@ export function Rewrite() {
               <p className="mt-2 text-[13px] leading-relaxed text-fg-muted">
                 根据本案例的追问回答整理，请先核对。下方案例建议供独立对比。
               </p>
-              <p className="mt-3 break-words text-[14px] leading-relaxed">{evidence}</p>
+              <p className="mt-3 whitespace-pre-line break-words text-[14px] leading-relaxed">{evidence.text}</p>
+              {evidence.pending.length > 0 && <p className="mt-2 text-sm text-warn">尚待核对：{evidence.pending.join('、')}。这些缺口不会写入导出。</p>}
               <label className="mt-4 flex items-start gap-2 text-[13px] text-fg">
                 <input
                   type="checkbox"
@@ -321,7 +322,7 @@ export function Rewrite() {
                 onClick={() => setShowExport(true)}
                 icon={<ArrowRight className="h-3.5 w-3.5" />}
               >
-                导出投递版
+                预览投递文本
               </Button>
             </div>
           </div>

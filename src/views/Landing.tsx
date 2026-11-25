@@ -39,13 +39,17 @@ export function Landing() {
                   onClick={() => navigate('/app')}
                   icon={<ArrowRight className="h-4 w-4" />}
                 >
-                  进入产品演示
+                  体验完整案例
                 </Button>
                 <Button size="lg" variant="outline" onClick={() => navigate('/method')}>
                   看我们的访谈方法论
                 </Button>
               </div>
 
+              <p className="mt-4 text-sm text-fg-muted">
+                当前为案例演示。
+                <LinkArrow onClick={() => navigate('/practice')}>用自己的经历练一条</LinkArrow>
+              </p>
               <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] tracking-wide text-fg-dim">
                 <span className="flex items-center gap-1.5">
                   <Target className="h-3.5 w-3.5" />
@@ -61,6 +65,9 @@ export function Landing() {
             {/* 右 */}
             <div className="animate-fade lg:pl-4" style={{ animationDelay: '160ms' }}>
               <HeroDemo />
+              <div className="mt-4 flex justify-end">
+                <LinkArrow onClick={() => navigate('/practice/example')}>直接体验这条追问</LinkArrow>
+              </div>
             </div>
           </div>
         </Shell>
@@ -71,7 +78,7 @@ export function Landing() {
         <Shell>
           <div className="grid grid-cols-2 divide-ink-700/60 sm:grid-cols-4 sm:divide-x">
             {[
-              { n: '5', u: '份', l: '真实求职访谈', s: 'S01–S05 转录稿' },
+              { n: '7', u: '份', l: '学生与 HR 访谈', s: '5 位学生 · 2 位招聘者' },
               { n: '3', u: '类', l: '首批试点岗位', s: '教培 / 后端 / 产品运营' },
               { n: '6', u: '维', l: 'HR 评价维度', s: '含初始权重' },
               { n: '0', u: '处', l: '允许 AI 新增事实', s: '三道校验闸' },

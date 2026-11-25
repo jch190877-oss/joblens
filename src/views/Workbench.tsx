@@ -30,8 +30,11 @@ export function Workbench() {
             用一个案例体验岗位对照
           </h1>
           <p className="mt-2.5 max-w-xl text-[13.5px] leading-relaxed text-fg-muted">
-            选择一个脱敏案例，依次查看简历、岗位描述和预设对照报告。自定义材料分析待接入。
+            选择一个脱敏案例，依次查看简历、岗位描述和预设对照报告。整份自定义简历分析待接入。
           </p>
+          <Button variant="outline" size="sm" className="mt-3" onClick={() => navigate('/practice')}>
+            用自己的经历练一条
+          </Button>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-ink-700 bg-ink-850/60 px-3 py-2">
           <Shield className="h-3.5 w-3.5 text-ok" />

@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { StatusPill, Tag } from './ui'
+import { useEffect, useMemo, useState } from 'react'
+import { CASES, scoreOf } from '../data/demo'
+import { StatusPill, Tag, STATUS_META } from './ui'
 import { CheckCircle, Shield, Sparkle } from './icons'
 
 /**
@@ -22,6 +23,14 @@ const STEPS = [
   { at: 2350, key: 'ask' }, // AI 追问
   { at: 3050, key: 'gate' }, // 事实拦截
 ]
+
+const sample = CASES[1]
+const sampleScore = scoreOf(sample).value
+const [gate, evidence, , communication] = sample.requirements
+const statusCounts = (['met', 'partial', 'missing', 'unverified'] as const)
+  .map((status) => ({ status, count: sample.requirements.filter((r) => r.status === status).length }))
+  .filter(({ count }) => count > 0)
+const blockedExample = CASES[0].rewrites.find((row) => row.fact === 'blocked')
 
 const ASK_TEXT = '你说「会编写一些程序」——具体用什么语言？抓了多少条？'
 
@@ -68,13 +77,13 @@ function Row({
 export function HeroDemo() {
   const { stage, reduced } = useStages()
   const [typed, setTyped] = useState(reduced ? ASK_TEXT : '')
-  const [score, setScore] = useState(reduced ? 57 : 0)
-  const askStarted = useRef(false)
+  const [score, setScore] = useState(reduced ? sampleScore : 0)
+  const showAsk = stage >= 7
+  const showScore = stage >= 6
 
   // AI 追问打字机
   useEffect(() => {
-    if (reduced || stage < 7 || askStarted.current) return
-    askStarted.current = true
+    if (reduced || !showAsk) return
     let i = 0
     const id = window.setInterval(() => {
       i += 1
@@ -82,19 +91,19 @@ export function HeroDemo() {
       if (i >= ASK_TEXT.length) window.clearInterval(id)
     }, 34)
     return () => window.clearInterval(id)
-  }, [stage, reduced])
+  }, [showAsk, reduced])
 
   // 分数滚动
   useEffect(() => {
-    if (reduced || stage < 6) return
+    if (reduced || !showScore) return
     let n = 0
     const id = window.setInterval(() => {
       n += 3
-      setScore(Math.min(57, n))
-      if (n >= 57) window.clearInterval(id)
+      setScore(Math.min(sampleScore, n))
+      if (n >= sampleScore) window.clearInterval(id)
     }, 26)
     return () => window.clearInterval(id)
-  }, [stage, reduced])
+  }, [showScore, reduced])
 
   return (
     <div className="relative">
@@ -128,9 +137,9 @@ export function HeroDemo() {
             <span className="text-[11px] text-fg-dim">/100 综合匹配</span>
           </div>
           <div className="flex flex-wrap justify-end gap-1.5">
-            <Tag tone="ok">1 满足</Tag>
-            <Tag tone="warn">2 部分</Tag>
-            <Tag tone="info">2 待核实</Tag>
+            {statusCounts.map(({ status, count }) => (
+              <Tag key={status} tone={STATUS_META[status].tone}>{count} {STATUS_META[status].label}</Tag>
+            ))}
           </div>
         </div>
 
@@ -140,12 +149,12 @@ export function HeroDemo() {
           <Row show={at(stage, 1)}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="mb-1 font-mono text-[9.5px] tracking-widest text-fg-dim">R-01</div>
+                <div className="mb-1 font-mono text-[9.5px] tracking-widest text-fg-dim">{gate.rule}</div>
                 <p className="text-[12.5px] leading-[1.65] text-fg/90">
-                  本科在读，计算机 / 信息管理 / 财会相关专业
+                  {gate.jdLine}
                 </p>
               </div>
-              <StatusPill status="met" size="sm" />
+              <StatusPill status={gate.status} size="sm" />
             </div>
           </Row>
 
@@ -153,9 +162,9 @@ export function HeroDemo() {
           <Row show={at(stage, 2)}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="mb-1 font-mono text-[9.5px] tracking-widest text-fg-dim">R-02</div>
+                <div className="mb-1 font-mono text-[9.5px] tracking-widest text-fg-dim">{evidence.rule}</div>
                 <p className="text-[12.5px] leading-[1.65] text-fg/90">
-                  使用 SQL / Python 提取、清洗、分析业务数据，形成审计底稿
+                  {evidence.jdLine}
                 </p>
               </div>
               <div
@@ -163,7 +172,7 @@ export function HeroDemo() {
                   at(stage, 4) ? 'opacity-100' : 'opacity-0'
                 }`}
               >
-                <StatusPill status="partial" size="sm" />
+                <StatusPill status={evidence.status} size="sm" />
               </div>
             </div>
 
@@ -179,7 +188,7 @@ export function HeroDemo() {
                   简历原文依据
                 </div>
                 <p className="text-[11.5px] leading-relaxed text-fg-muted">
-                  「会编写一些程序，通过程序获取客户的联系方式」
+                  「{evidence.evidence}」
                 </p>
               </div>
             </div>
@@ -191,7 +200,7 @@ export function HeroDemo() {
               }`}
             >
               <Sparkle className="mt-0.5 h-3 w-3 shrink-0" />
-              <span>缺：语言与工具 · 数据规模 · 清洗方法 · 交付物</span>
+              <span>待补：{evidence.gap}</span>
             </div>
           </Row>
 
@@ -199,12 +208,12 @@ export function HeroDemo() {
           <Row show={at(stage, 5)}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="mb-1 font-mono text-[9.5px] tracking-widest text-fg-dim">R-04</div>
+                <div className="mb-1 font-mono text-[9.5px] tracking-widest text-fg-dim">{communication.rule}</div>
                 <p className="text-[12.5px] leading-[1.65] text-fg/90">
-                  与业务部门沟通，理解客户需求并转化为可执行的检查方案
+                  {communication.jdLine}
                 </p>
               </div>
-              <StatusPill status="unverified" size="sm" />
+              <StatusPill status={communication.status} size="sm" />
             </div>
           </Row>
         </div>
@@ -245,12 +254,10 @@ export function HeroDemo() {
         </span>
         <div>
           <div className="mb-0.5 font-mono text-[9.5px] uppercase tracking-widest text-bad">
-            事实校验 · 已拦截 1 处
+            事实校验示例 · {CASES[0].code} 产品运营
           </div>
           <p className="text-[11.5px] leading-relaxed text-fg-muted">
-            AI 初稿补写了「促成 18 万美元成交额」，而
-            <span className="text-bad">简历原文无任何成交记录</span>
-            ，已被拦截并要求你补充真实数字。
+            {blockedExample?.factNote}
           </p>
         </div>
       </div>

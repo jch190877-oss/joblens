@@ -69,7 +69,7 @@ export interface Case {
   resume: string
   jd: string
   requirements: Requirement[]
-  priority: { title: string; detail: string }[]
+  priority: { title: string; detail: string; requirementId?: string }[]
   rewrites: Rewrite[]
   deep: DeepBlock
   hrFold: string[]
@@ -89,14 +89,9 @@ export const STATUS_SCORE: Record<Status, number> = {
   missing: 0,
 }
 
-export interface ScoreRow {
-  id: string
-  rule: string
-  type: ReqType
-  jdLine: string
+export interface ScoreRow extends Requirement {
   /** 归一化后的权重，同一案例内合计 100 */
   weight: number
-  status: Status
   statusScore: number
   gained: number
   lost: number
@@ -120,12 +115,8 @@ export function scoreOf(c: Case): ScoreResult {
     const statusScore = STATUS_SCORE[r.status]
     const gained = weight * statusScore
     return {
-      id: r.id,
-      rule: r.rule,
-      type: r.type,
-      jdLine: r.jdLine,
+      ...r,
       weight,
-      status: r.status,
       statusScore,
       gained,
       lost: weight - gained,
@@ -227,7 +218,7 @@ const CASE_A: Case = {
       type: 'core',
       jdLine: '分析运营数据，输出内容复盘报告',
       weight: 18,
-      status: 'partial',
+      status: 'unverified',
       evidence: '（简历中无对应内容）',
       note: '你提到「出过一些流量比较好的爆款」，但没有写数据口径、也没体现复盘动作。',
       rule: 'CL-07',
@@ -269,7 +260,8 @@ const CASE_A: Case = {
   priority: [
     {
       title: '账号运营数据',
-      detail: '平台、粉丝基数与增长、发布频率——这条权重 20%，目前证据为零。',
+      requirementId: 'A2',
+      detail: '请补充平台、粉丝基数与增长、发布频率。',
     },
     {
       title: '一篇爆款的具体量级',
@@ -535,7 +527,8 @@ Python、Java、MySQL`,
   priority: [
     {
       title: '爬虫经历的真实参数',
-      detail: '什么语言、抓了多少条、怎么处理封禁与脏数据——这条权重 25%，目前几乎是空的。',
+      requirementId: 'B1',
+      detail: '请补充使用的语言、处理条数，以及应对封禁与脏数据的方法。',
     },
     {
       title: '商赛里你具体做了什么',
@@ -782,9 +775,9 @@ const CASE_C: Case = {
       type: 'core',
       jdLine: '与家长保持沟通，反馈学员学习情况并给出提升建议',
       weight: 16,
-      status: 'missing',
+      status: 'unverified',
       evidence: '（简历中无对应内容）',
-      note: '这是教培岗位的核心差异点——续费率几乎完全取决于家长沟通。目前证据为零。',
+      note: '简历未提到家长沟通。可补充你实际参与过的家校沟通情境，再判断是否满足。',
       rule: 'CL-10',
       gap: '任何一次家长会、家访或家校群沟通的真实场景',
     },

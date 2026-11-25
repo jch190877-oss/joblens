@@ -6,9 +6,9 @@ import type { HrProfile } from '../data/hr'
  *
  * - 门槛达成 / 相关经历 / 加分储备：按要求类型分组，组内加权平均达成度
  * - 表达与结构：来自投递前检查（必须补 −20 / 注意 −8）
- * - 可信度：来自改写的四种事实标记（已拦截 −12 / 需补数字 −6）
+ * - 待核对事实：由改写页单独统计，不给求职者扣分
  *
- * 注意：这五个维度是「分组视图」，不是总分的分解项——
+ * 注意：这四个维度是「分组视图」，不是总分的分解项——
  * 总分是按每条要求的权重逐条加权，维度是按类型分组后各自平均，口径不同。
  */
 
@@ -33,10 +33,6 @@ export function dimsOf(c: Case, hr?: HrProfile): Dimension[] {
   const fail = pres.filter((x) => x.status === 'fail').length
   const warn = pres.filter((x) => x.status === 'warn').length
   const format = Math.max(0, 100 - 20 * fail - 8 * warn)
-
-  const blocked = c.rewrites.filter((r) => r.fact === 'blocked').length
-  const needsNum = c.rewrites.filter((r) => r.fact === 'needs-number').length
-  const trust = Math.max(0, 100 - 12 * blocked - 6 * needsNum)
 
   return [
     {
@@ -66,12 +62,6 @@ export function dimsOf(c: Case, hr?: HrProfile): Dimension[] {
       label: '表达与结构',
       score: format,
       basis: `投递前检查：${fail} 项必须补、${warn} 项注意（每项扣 20 / 8 分）`,
-    },
-    {
-      key: 'trust',
-      label: '可信度',
-      score: trust,
-      basis: `改写中 ${blocked} 处被拦截、${needsNum} 处待补数字（每处扣 12 / 6 分）`,
     },
   ]
 }

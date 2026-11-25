@@ -74,7 +74,7 @@ function ReqRow({ r }: { r: Requirement }) {
             简历原文依据
           </div>
           <p
-            className={`text-[12px] leading-relaxed ${
+            className={`text-sm leading-relaxed ${
               r.evidence && !r.evidence.startsWith('（') ? 'text-fg-muted' : 'text-fg-dim/70'
             }`}
           >
@@ -89,7 +89,7 @@ function ReqRow({ r }: { r: Requirement }) {
         <div className="mt-2.5 flex items-start gap-1.5 rounded-md border border-warn/20 bg-warn/[0.04] px-2.5 py-2">
           <Sparkle className="mt-0.5 h-3 w-3 shrink-0 text-warn" />
           <span className="text-[11.5px] leading-relaxed text-warn/90">
-            <span className="font-medium">待你补充：</span>
+            <span className="font-semibold">待你补充：</span>
             {r.gap}
           </span>
         </div>
@@ -101,6 +101,8 @@ function ReqRow({ r }: { r: Requirement }) {
 export function Report() {
   const current = useCase()
   const currentId = useCaseId()
+  const blockedCount = current.rewrites.filter((row) => row.fact === 'blocked').length
+  const needsNumber = current.rewrites.filter((row) => row.fact === 'needs-number').length
 
   const stats = useMemo(() => {
     const s = { met: 0, partial: 0, missing: 0, unverified: 0 }
@@ -134,6 +136,39 @@ export function Report() {
     { key: 'plus', label: '加分项', hint: '同等条件下拉开差距' },
   ] as const
 
+  function exportReport() {
+    const report = [
+      '职镜 · 示例对照报告',
+      `${current.code} · ${current.role}`,
+      `示例材料匹配度：${sc.value}/100（原始加权分 ${sc.raw.toFixed(1)}）`,
+      ...(sc.hardFail ? ['存在明确不满足的硬性条件，总分封顶 40。'] : []),
+      '分数用于定位材料缺口。',
+      '',
+      ...sc.rows.flatMap((row) => [
+        `[${row.rule}] ${row.jdLine}`,
+        `${STATUS_META[row.status].label} · 权重 ${Number(row.weight.toFixed(1))}% · 得分 ${row.gained.toFixed(1)}`,
+        `原文依据：${row.evidence || '未找到对应表述'}`,
+        `判断说明：${row.note}`,
+        ...(row.gap ? [`待补：${row.gap}`] : []),
+        '',
+      ]),
+      `投递稿事实风险：${needsNumber} 处待补数字，${blockedCount} 处新增事实已拦截。`,
+      ...(hr ? ['', '投递前自检', ...hr.checks.map((item) => `${CHECK_META[item.status].label} · ${item.label}：${item.detail}`)] : []),
+    ].join('\n')
+    const url = URL.createObjectURL(new Blob(['\uFEFF', report], { type: 'text/plain;charset=utf-8' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `职镜-${current.code}-对照报告.txt`
+    link.click()
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+
+  function jumpTo(id: string) {
+    const section = document.getElementById(id)
+    section?.focus({ preventScroll: true })
+    section?.scrollIntoView({ block: 'start' })
+  }
+
   return (
     <div className="relative">
       <div className="grid-bg pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-40" />
@@ -161,7 +196,7 @@ export function Report() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="outline" size="sm" icon={<Download className="h-3.5 w-3.5" />}>
+              <Button variant="outline" size="sm" onClick={exportReport} icon={<Download className="h-3.5 w-3.5" />}>
                 导出报告
               </Button>
               <Button
@@ -194,7 +229,7 @@ export function Report() {
           </div>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1fr_306px]">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_306px]">
           {/* ============ 主栏 ============ */}
           <div className="space-y-5">
             {/* 概览 */}
@@ -202,7 +237,12 @@ export function Report() {
               <div className="grid gap-7 p-6 sm:grid-cols-[188px_1fr] sm:gap-9">
                 {/* 左：分数 + 一句话结论 */}
                 <div className="flex flex-col items-center gap-4 sm:items-start">
-                  <ScoreDial value={sc.value} sub={current.code} />
+                  <ScoreDial value={sc.value} label="示例材料匹配度" sub={current.code} />
+                  <div className="flex flex-wrap gap-x-2 gap-y-1">
+                    <button type="button" className="text-xs font-medium text-brand-400 underline underline-offset-2" onClick={() => jumpTo('report-priority')}>先补什么</button>
+                    <button type="button" className="text-xs font-medium text-brand-400 underline underline-offset-2" onClick={() => jumpTo('report-evidence')}>判定依据</button>
+                    {hr && <button type="button" className="text-xs font-medium text-brand-400 underline underline-offset-2" onClick={() => jumpTo('report-checks')}>投递前检查</button>}
+                  </div>
                   <div className="w-full rounded-lg border border-ink-700/70 bg-ink-900/60 px-3 py-2.5">
                     <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-fg-dim">
                       主要失分
@@ -350,7 +390,7 @@ export function Report() {
                     {sc.hardFail ? (
                       <p className="text-bad">存在硬性条件不满足，按门槛规则总分封顶 40。</p>
                     ) : (
-                      <p>硬性条件全部满足，未触发封顶规则。</p>
+                      <p>未发现明确不满足的硬性条件，未触发封顶规则。</p>
                     )}
                     <p>「诊断维度」为独立评估，用于定位问题，不参与这里的合成。</p>
                   </div>
@@ -392,7 +432,7 @@ export function Report() {
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-ink-700 bg-ink-900/40 px-5 py-3.5">
               <span className="flex items-center gap-1.5 text-[12px] font-medium text-fg">
                 <Shield className="h-3.5 w-3.5 text-ok" />
-                事实校验
+                投递稿事实风险
               </span>
               <span className="text-[11.5px] text-fg-muted">
                 原文可证 <span className="tnum text-ok">{stats.met + stats.partial}</span> 条
@@ -401,7 +441,10 @@ export function Report() {
                 待补充 <span className="tnum text-warn">{stats.missing + stats.unverified}</span> 项
               </span>
               <span className="text-[11.5px] text-fg-muted">
-                已拦截 <span className="tnum text-bad">1</span> 处 AI 新增事实
+                待补数字 <span className="tnum text-warn">{needsNumber}</span> 处
+              </span>
+              <span className="text-[11.5px] text-fg-muted">
+                已拦截 <span className="tnum text-bad">{blockedCount}</span> 处 AI 新增事实
               </span>
               <span className="ml-auto font-mono text-[10px] text-fg-dim">
                 规则库 v0.3 · 3 道闸
@@ -565,6 +608,7 @@ export function Report() {
               </Reveal>
             )}
 
+            <h2 id="report-evidence" tabIndex={-1} className="editorial-heading scroll-mt-24 text-2xl">岗位判定与原文依据</h2>
             {/* 逐条对照 */}
             {groups.map((g) => {
               const list = current.requirements.filter((r) => r.type === g.key)
@@ -595,7 +639,7 @@ export function Report() {
                   <header className="flex items-center justify-between border-b border-ink-700/70 bg-ink-900/40 px-5 py-3.5 sm:px-6">
                     <div className="flex items-center gap-2.5">
                       <AlertTriangle className="h-3.5 w-3.5 text-fg-dim" />
-                      <h2 className="text-[13.5px] font-semibold">投递前自检</h2>
+                      <h2 id="report-checks" tabIndex={-1} className="scroll-mt-24 text-base font-semibold">投递前自检</h2>
                       <span className="hidden text-[11.5px] text-fg-dim sm:inline">
                         和文笔无关，但会直接导致淘汰
                       </span>
@@ -659,10 +703,10 @@ export function Report() {
 
           {/* ============ 右栏 ============ */}
           <aside className="space-y-4 lg:sticky lg:top-[88px] lg:self-start">
-            <div className="panel rounded-xl p-5">
+            <div id="report-priority" tabIndex={-1} className="panel scroll-mt-24 rounded-xl p-5">
               <div className="mb-3 flex items-center justify-between">
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
-                  必须补的信息
+                  先补这些事实
                 </span>
                 <span className="rounded bg-warn/15 px-1.5 py-0.5 font-mono text-[9.5px] text-warn">
                   {current.priority.length}
@@ -676,7 +720,7 @@ export function Report() {
                     </span>
                     <div>
                       <div className="text-[12.5px] font-medium leading-snug">{p.title}</div>
-                      <p className="mt-1 text-[11.5px] leading-relaxed text-fg-dim">{p.detail}</p>
+                      <p className="mt-1 text-[11.5px] leading-relaxed text-fg-dim">{p.detail}{p.requirementId && sc.rows.some((row) => row.id === p.requirementId) && ` 对应要求权重 ${Number(sc.rows.find((row) => row.id === p.requirementId)?.weight.toFixed(1))}%。`}</p>
                     </div>
                   </li>
                 ))}

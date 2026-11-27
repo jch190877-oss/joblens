@@ -1,6 +1,6 @@
 import { Button, Kicker, LinkArrow, SectionHead, Shell } from '../components/ui'
-import { ArrowRight, ArrowUpRight, Quote, Shield, Target } from '../components/icons'
-import { HeroDemo } from '../components/HeroDemo'
+import { ArrowRight, ArrowUpRight, ChevronRight, Quote, Shield, Target } from '../components/icons'
+import { ResumePaper } from '../components/ResumePaper'
 import { Reveal } from '../components/Reveal'
 import { navigate } from '../lib/router'
 import { COMPARISON, FLOW, PAIN_POINTS } from '../data/demo'
@@ -20,29 +20,48 @@ export function Landing() {
           <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
             {/* 左 */}
             <div className="animate-rise">
-              <Kicker className="mb-5">AI 简历竞争力分析 · 大学生求职场景</Kicker>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-500/25 bg-brand-500/[0.07] px-3 py-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+                <span className="text-[12.5px] font-semibold tracking-wide text-brand-600">
+                  AI 简历优化平台
+                </span>
+                <span className="text-[11.5px] text-fg-dim">· 面向大学生求职</span>
+              </div>
 
               <h1 className="hero-title">
                 把做过的事，
                 <span className="hero-title-accent text-grad">讲成值得录用的证据</span>
               </h1>
 
-              <p className="mt-6 max-w-[35rem] text-[16px] leading-[1.9] sm:text-[17px] text-fg-muted">
+              <p className="mt-6 max-w-[35rem] text-[16px] leading-[1.9] text-fg-muted sm:text-[17px]">
                 职镜不会替你编经历。它只做一件事：
                 <span className="text-fg"> 把目标岗位的要求逐条拆开，再把你真实做过的事，一条一条对上。</span>
                 对不上的地方，它不猜——它来问你。
               </p>
 
+              <p className="mt-3 max-w-[35rem] text-[15px] leading-[1.8] text-fg-dim">
+                最后你拿到的不是一份评分报告，而是
+                <span className="text-fg"> 一份改好、可以直接投出去的简历</span>。
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12.5px] text-fg-muted">
+                <span className="rounded border border-ink-600 bg-ink-900/60 px-2 py-0.5">贴上简历</span>
+                <ChevronRight className="h-3 w-3 text-ink-500" />
+                <span className="rounded border border-ink-600 bg-ink-900/60 px-2 py-0.5">
+                  按岗位逐条对照
+                </span>
+                <ChevronRight className="h-3 w-3 text-ink-500" />
+                <span className="rounded border border-brand-500/30 bg-brand-500/[0.08] px-2 py-0.5 font-medium text-brand-600">
+                  改完直接投
+                </span>
+              </div>
+
               <div className="mt-9 flex flex-wrap items-center gap-3">
-                <Button
-                  size="lg"
-                  onClick={() => navigate('/app')}
-                  icon={<ArrowRight className="h-4 w-4" />}
-                >
-                  体验完整案例
+                <Button size="lg" onClick={() => navigate('/app')} icon={<ArrowRight className="h-4 w-4" />}>
+                  开始改简历
                 </Button>
                 <Button size="lg" variant="outline" onClick={() => navigate('/method')}>
-                  看我们的访谈方法论
+                  看访谈方法论
                 </Button>
               </div>
 
@@ -62,9 +81,9 @@ export function Landing() {
               </div>
             </div>
 
-            {/* 右 */}
+            {/* 右：一份正在被修改的简历 */}
             <div className="animate-fade lg:pl-4" style={{ animationDelay: '160ms' }}>
-              <HeroDemo />
+              <ResumePaper />
               <div className="mt-4 flex justify-end">
                 <LinkArrow onClick={() => navigate('/practice/example')}>直接体验这条追问</LinkArrow>
               </div>

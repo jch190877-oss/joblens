@@ -3,14 +3,14 @@ packages:
   - '.'
 
 # 扁平 node_modules（接近 npm 布局）。
-# 团队里 Windows 同学克隆后直接 install 即可，不依赖符号链接权限，
-# 也不会出现「找不到某个间接依赖」的报错。
+# 团队里 Windows 同学克隆后直接 install 即可，不依赖符号链接权限。
 nodeLinker: hoisted
 
-# 只允许 esbuild 执行安装脚本（它需要落位平台二进制）。
-# 其他依赖的 postinstall 一律不跑，降低供应链风险。
+# 允许 esbuild 的安装脚本（需要落位平台二进制）
 allowBuilds:
   esbuild: true
+  # 显式拒绝：tesseract.js 的脚本会去拉语言包，我们改为运行时按需加载
+  tesseract.js: false
 
 # 每次 run 前不重复做依赖校验
 verifyDepsBeforeRun: false

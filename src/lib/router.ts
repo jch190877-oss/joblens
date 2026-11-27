@@ -33,6 +33,7 @@ export function navigate(to: string) {
 export type NavItem = { label: string; to: string; match?: string[] }
 
 export const NAV: NavItem[] = [
+  { label: '上传简历', to: '/upload' },
   { label: '分析工作台', to: '/app' },
   { label: '分析报告', to: '/report' },
   { label: '经历深挖', to: '/deepdive' },

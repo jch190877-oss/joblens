@@ -6,6 +6,7 @@ import { Report } from './views/Report'
 import { Deepdive } from './views/Deepdive'
 import { Rewrite } from './views/Rewrite'
 import { Resume } from './views/Resume'
+import { Upload } from './views/Upload'
 import { Practice } from './views/Practice'
 import { Method } from './views/Method'
 
@@ -16,6 +17,9 @@ export default function App() {
   switch (route) {
     case '/app':
       content = <Workbench />
+      break
+    case '/upload':
+      content = <Upload />
       break
     case '/practice':
       content = <Practice key="personal" />

@@ -57,11 +57,11 @@ export function Landing() {
               </div>
 
               <div className="mt-9 flex flex-wrap items-center gap-3">
-                <Button size="lg" onClick={() => navigate('/app')} icon={<ArrowRight className="h-4 w-4" />}>
-                  开始改简历
+                <Button size="lg" onClick={() => navigate('/upload')} icon={<ArrowRight className="h-4 w-4" />}>
+                  上传简历，先体检
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/method')}>
-                  看访谈方法论
+                <Button size="lg" variant="outline" onClick={() => navigate('/app')}>
+                  看预设案例
                 </Button>
               </div>
 

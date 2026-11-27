@@ -23,6 +23,7 @@ import {
 } from '../components/icons'
 import { navigate } from '../lib/router'
 import { Reveal } from '../components/Reveal'
+import { ResumeThumb } from '../components/ResumeThumb'
 import { CASES, scoreOf, type Requirement } from '../data/demo'
 import { dimsOf } from '../lib/scoring'
 import { HR_BY_CASE, VERDICT_META, CHECK_META } from '../data/hr'
@@ -232,6 +233,50 @@ export function Report() {
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_306px]">
           {/* ============ 主栏 ============ */}
           <div className="space-y-5">
+            {/* 简历原文档案：先给"一份文档"，再给评分 */}
+            <Reveal>
+              <section className="panel overflow-hidden rounded-xl">
+                <div className="grid sm:grid-cols-[168px_1fr]">
+                  <div className="border-b border-ink-700/60 bg-ink-900/50 p-4 sm:border-b-0 sm:border-r">
+                    <ResumeThumb resume={current.resume} rewrites={current.rewrites} />
+                  </div>
+
+                  <div className="p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h2 className="flex items-center gap-2 text-[13.5px] font-semibold">
+                        <Doc className="h-3.5 w-3.5 text-fg-dim" />
+                        简历原文
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/resume')}
+                        className="group inline-flex items-center gap-1 text-[11.5px] font-medium text-brand-600 transition-colors hover:text-brand-500"
+                      >
+                        打开简历逐条改
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                      </button>
+                    </div>
+
+                    <p className="mt-2 text-[12.5px] leading-[1.75] text-fg-muted">
+                      下面所有判定，都是对着这一份原文做出的。
+                      <span className="text-warn"> 黄色标记</span>是本次有改写建议的行。
+                    </p>
+
+                    <ul className="mt-3 space-y-1.5">
+                      {current.rewrites.slice(0, 3).map((r) => (
+                        <li key={r.id} className="flex items-start gap-2">
+                          <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-warn/70" />
+                          <span className="truncate text-[11.5px] leading-relaxed text-fg-dim">
+                            {r.before}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            </Reveal>
+
             {/* 概览 */}
             <section className="panel overflow-hidden rounded-xl">
               <div className="grid gap-7 p-6 sm:grid-cols-[188px_1fr] sm:gap-9">

@@ -5,6 +5,7 @@ import { Workbench } from './views/Workbench'
 import { Report } from './views/Report'
 import { Deepdive } from './views/Deepdive'
 import { Rewrite } from './views/Rewrite'
+import { Resume } from './views/Resume'
 import { Practice } from './views/Practice'
 import { Method } from './views/Method'
 
@@ -24,6 +25,9 @@ export default function App() {
       break
     case '/report':
       content = <Report />
+      break
+    case '/resume':
+      content = <Resume />
       break
     case '/deepdive':
       content = <Deepdive />

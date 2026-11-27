@@ -36,6 +36,7 @@ export const NAV: NavItem[] = [
   { label: '分析工作台', to: '/app' },
   { label: '分析报告', to: '/report' },
   { label: '经历深挖', to: '/deepdive' },
+  { label: '简历', to: '/resume' },
   { label: '改写工作台', to: '/rewrite' },
   { label: '方法论', to: '/method' },
 ]

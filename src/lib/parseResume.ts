@@ -99,10 +99,14 @@ async function parseImage(
   file: File,
   onProgress?: (m: string) => void,
 ): Promise<ParseResult> {
-  onProgress?.('加载中文识别模型（首次约 10–15 MB，会缓存）…')
+  onProgress?.('加载中文识别模型（本地 1.6 MB，已随站点打包）…')
   const { createWorker } = await import('tesseract.js')
 
+  // 语言包放在 public/tessdata，随站点一起发布——现场断网也能识别
+  const langPath = new URL('tessdata/', document.baseURI).href
+
   const worker = await createWorker('chi_sim+eng', 1, {
+    langPath,
     logger: (m: { status: string; progress: number }) => {
       if (m.status === 'recognizing text') {
         onProgress?.(`识别中 · ${Math.round(m.progress * 100)}%`)

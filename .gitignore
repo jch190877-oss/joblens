@@ -12,3 +12,6 @@ dist-ssr
 tmp-chrome/
 shots/
 tsconfig.tsbuildinfo
+
+# OCR 语言包的解压副本（tesseract 运行时会在工作目录生成，走 public/tessdata 的 .gz 即可）
+*.traineddata

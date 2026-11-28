@@ -7,6 +7,7 @@ import { Deepdive } from './views/Deepdive'
 import { Rewrite } from './views/Rewrite'
 import { Resume } from './views/Resume'
 import { Upload } from './views/Upload'
+import { Analyze } from './views/Analyze'
 import { Practice } from './views/Practice'
 import { Method } from './views/Method'
 
@@ -20,6 +21,9 @@ export default function App() {
       break
     case '/upload':
       content = <Upload />
+      break
+    case '/analyze':
+      content = <Analyze />
       break
     case '/practice':
       content = <Practice key="personal" />

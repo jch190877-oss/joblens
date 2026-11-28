@@ -300,17 +300,26 @@ export function Upload() {
               </div>
               <p className="mt-2 text-[11.5px] leading-relaxed text-fg-muted">
                 体检只能看出通用问题。要判断「这份简历配不配这个岗位」，
-                需要先把 JD 拆成条目、再逐条比对原文——这一步需要目标岗位描述。
-              </p>
-              <p className="mt-2 text-[11px] leading-relaxed text-fg-dim">
-                「自定义简历 + 自定义 JD」的完整分析链路仍在开发中。当前可以先用预设案例看完整流程。
+                需要先把 JD 拆成条目、再逐条比对原文——把那一段岗位描述贴进来就行。
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button size="sm" onClick={() => navigate('/app')} icon={<ArrowRight className="h-3.5 w-3.5" />}>
-                  看预设案例的完整对照
+                <Button
+                  size="sm"
+                  disabled={!text.trim()}
+                  onClick={() => {
+                    try {
+                      sessionStorage.setItem('jl.custom.resume', text)
+                    } catch {
+                      /* 忽略 */
+                    }
+                    navigate('/analyze')
+                  }}
+                  icon={<ArrowRight className="h-3.5 w-3.5" />}
+                >
+                  用这份简历做岗位对照
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => navigate('/report')}>
-                  看一份对照报告
+                <Button size="sm" variant="outline" onClick={() => navigate('/app')}>
+                  看预设案例
                 </Button>
               </div>
             </div>

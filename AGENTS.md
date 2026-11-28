@@ -116,11 +116,39 @@ git push --force origin main
 
 | 路由 | 文件 | 作用 |
 | --- | --- | --- |
-| `#/` | `src/views/Landing.tsx` | 首页：定位、痛点、流程、对比 |
-| `#/app` | `src/views/Workbench.tsx` | 分析工作台（三步） |
-| `#/report` | `src/views/Report.tsx` | 对照报告：五维评分 + 四态判定 |
+| `#/` | `src/views/Landing.tsx` | 首页：一份正在被修改的简历 + 定位 + 痛点 + 对比 |
+| `#/upload` | `src/views/Upload.tsx` | 多模态输入：文件 / 截图 / 粘贴 → 解析 → 6 项体检 |
+| `#/analyze` | `src/views/Analyze.tsx` | 自定义对照：自己的简历 + 自己的 JD → 规则版四态判定 |
+| `#/app` | `src/views/Workbench.tsx` | 分析工作台（三步向导，预设案例） |
+| `#/report` | `src/views/Report.tsx` | 对照报告：可复算总分 + 诊断维度 + 四态判定 |
 | `#/deepdive` | `src/views/Deepdive.tsx` | 反问式深挖（核心交互） |
-| `#/rewrite` | `src/views/Rewrite.tsx` | 改写工作台：采纳 + 事实拦截 |
-| `#/method` | `src/views/Method.tsx` | 方法论：访谈 → 功能介绍 |
+| `#/resume` | `src/views/Resume.tsx` | 简历页：采纳后原文实时改变，可导出投递版 |
+| `#/rewrite` | `src/views/Rewrite.tsx` | 改写工作台（与 /resume 有重叠，较早期） |
+| `#/practice` | `src/views/Practice.tsx` | 单条证据练习 |
+| `#/method` | `src/views/Method.tsx` | 方法论：7 位受访者、HR 视角、分歧、评分口径 |
 
-演示捷径：`?fill=1#/deepdive` 可预填示例回答，直接看到证据卡完成态。
+**演示捷径**：
+
+```
+?sample=1#/upload     预填示例简历
+?demo=1#/analyze      预填简历 + JD 并跑出对照结果
+?fill=1#/deepdive     预填深挖答案，直接看到证据卡完成态
+```
+
+---
+
+## 交接
+
+**完整交接文档见 [`HANDOFF.md`](HANDOFF.md)** —— 包含所有地址、路由、数据模型、环境坑、已知问题、演示动线。
+
+接手前必读，其中「证据边界」一节尤其重要：**不能声称的结论**都列在那里。
+
+---
+
+## 证据边界（写文案时不得违反）
+
+- 访谈共 **7 份**：5 位学生（S01–S05）+ 2 位 HR（HR01–HR02）
+- 两位 HR 均来自**教育行业**，不能外推
+- 两位 HR 的 **Q20–Q24（AI 相关）全部未作答**，产品中关于 AI 的判断属于推断
+- 尚未做与 HR 判断的一致性检验（kappa）
+
